@@ -1,0 +1,3614 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>심문실 404: 섀도우 아카이브 (딥 스토리 에디션)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+KR:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap');
+
+    body {
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      background-color: #06080d;
+      color: #e2e8f0;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .serif-novel { font-family: 'Noto Serif KR', Georgia, serif; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0e16; }
+    ::-webkit-scrollbar-thumb { background: #263042; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4a66; }
+    .scroll-safe { overscroll-behavior: contain; }
+
+    .crt-overlay {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+    }
+    .vignette-overlay {
+      box-shadow: inset 0 0 110px rgba(0, 0, 0, 0.85);
+      pointer-events: none;
+    }
+
+    @keyframes pulse-rec {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.9); }
+      50% { opacity: 0.25; transform: scale(0.85); box-shadow: 0 0 2px rgba(239, 68, 68, 0.2); }
+    }
+    .rec-dot { animation: pulse-rec 1.4s infinite ease-in-out; }
+
+    @keyframes pin-ring {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.75); }
+      70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    .hotspot-pin { animation: pin-ring 2s infinite; }
+
+    @keyframes screen-shake {
+      0%, 100% { transform: translate(0, 0); }
+      20% { transform: translate(-7px, 3px); }
+      40% { transform: translate(7px, -3px); }
+      60% { transform: translate(-5px, -2px); }
+      80% { transform: translate(5px, 2px); }
+    }
+    .shake-now { animation: screen-shake 0.38s ease-in-out; }
+
+    @keyframes blink-cur {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .typing-cursor::after {
+      content: '▋';
+      margin-left: 2px;
+      color: #f59e0b;
+      animation: blink-cur 0.7s infinite;
+    }
+
+    @keyframes stamp-drop {
+      0% { transform: scale(2.8) rotate(-18deg); opacity: 0; }
+      65% { transform: scale(0.94) rotate(-10deg); opacity: 1; }
+      100% { transform: scale(1) rotate(-10deg); opacity: 1; }
+    }
+    .stamp-anim { animation: stamp-drop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards; }
+
+    @keyframes shockwave-flash {
+      0% { opacity: 0.9; transform: scale(0.94); }
+      50% { opacity: 0.45; transform: scale(1.01); }
+      100% { opacity: 0; transform: scale(1.04); }
+    }
+    .shockwave-anim { animation: shockwave-flash 0.55s ease-out forwards; }
+
+    @keyframes slip-banner-in {
+      0% { opacity: 0; transform: translateY(-16px) scale(0.96); }
+      18% { opacity: 1; transform: translateY(0) scale(1); }
+      82% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-10px) scale(0.98); }
+    }
+    .slip-banner-anim { animation: slip-banner-in 2.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+    @keyframes evidence-slide-up {
+      0% { opacity: 0; transform: translateY(14px) scale(0.95); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .evidence-present-anim { animation: evidence-slide-up 0.35s ease-out forwards; }
+
+    @keyframes page-turn {
+      0% { opacity: 0; transform: translateX(14px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    .novel-page-anim { animation: page-turn 0.32s ease-out forwards; }
+  </style>
+</head>
+<body id="app-body" class="min-h-screen lg:h-screen flex flex-col lg:overflow-hidden bg-[#06080d] text-slate-200 select-none relative">
+
+  <div class="fixed inset-0 crt-overlay z-40 opacity-35"></div>
+  <div class="fixed inset-0 vignette-overlay z-40"></div>
+
+  <!-- 시각 이펙트 오버레이 (논리 돌파 충격파 & 말실수 포착 배너) -->
+  <div id="fx-shockwave" class="hidden fixed inset-0 z-50 pointer-events-none border-[6px] border-amber-400/80 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.22)_0%,transparent_70%)]"></div>
+  <div id="fx-slip-toast" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none bg-gradient-to-r from-amber-950/95 via-red-950/95 to-amber-950/95 border border-amber-400/80 text-amber-200 px-5 py-2.5 rounded-2xl shadow-[0_0_35px_rgba(245,158,11,0.5)] text-xs sm:text-sm font-black tracking-wide flex items-center gap-2">
+    <span id="fx-slip-icon">⚡</span>
+    <span id="fx-slip-text">말실수 포착!</span>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 0. 동적 캠페인 브리핑 화면 (1번째 튜토리얼 → 2번째부터 4개 사건 선택) -->
+  <!-- ===================================================================== -->
+  <div id="landing-screen" class="fixed inset-0 z-[60] bg-[#04060a] flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <canvas id="noir-particles" class="fixed inset-0 pointer-events-none opacity-45"></canvas>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.1)_0%,rgba(4,6,10,0.97)_75%)] pointer-events-none"></div>
+
+    <div class="relative z-10 max-w-5xl w-full flex flex-col gap-5 my-auto py-4">
+      <!-- 상단 타이틀 & 평판 배지 -->
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+        <div>
+          <div class="inline-flex items-center gap-2 bg-red-950/75 border border-red-600/70 px-3.5 py-1 rounded-full text-[11px] text-red-300 font-bold mono mb-2">
+            <span class="w-2 h-2 rounded-full bg-red-500 rec-dot"></span>
+            <span id="landing-mode-badge">TUTORIAL STAGE // 01</span>
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white">
+            심문실 <span class="text-amber-500 mono">404</span>
+            <span class="text-sm sm:text-lg font-extrabold text-slate-400 ml-1.5">: 섀도우 아카이브</span>
+          </h1>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <div id="landing-reputation-badge" class="bg-[#0e131e] border border-slate-700 px-3.5 py-2 rounded-xl text-xs font-extrabold text-amber-300">
+            ⚖️ 평판: 신입 수사관
+          </div>
+          <div class="flex items-center gap-2 bg-[#111622] border border-slate-700 px-3 py-1.5 rounded-xl">
+            <button type="button" onclick="toggleAudioEngine()"
+              class="hover:text-amber-300 text-slate-200 font-bold text-xs transition flex items-center gap-1.5">
+              <span id="landing-sound-icon">🔇</span>
+              <span id="landing-sound-label">BGM 켜기</span>
+            </button>
+            <input id="landing-volume-slider" type="range" min="0" max="100" value="80"
+              oninput="setMasterVolume(this.value)" title="음량 조절"
+              class="w-20 sm:w-24 accent-amber-500 cursor-pointer" />
+            <span id="landing-volume-text" class="mono text-[11px] text-amber-300 font-bold w-8 text-right">80%</span>
+          </div>
+          <button type="button" onclick="toggleTtsVoice()"
+            class="bg-[#111622] hover:bg-[#1a2234] border border-slate-700 text-cyan-300 font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5">
+            <span id="landing-tts-icon">🗣️</span>
+            <span id="landing-tts-label">보이스 TTS 켜짐</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 동적 브리핑 콘텐츠 영역 (튜토리얼 단독 카드 OR 4개 사건 선택 보드) -->
+      <div id="landing-dynamic-area" class="w-full"></div>
+
+      <!-- 하단 진행 상태 & 초기화 -->
+      <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 border-t border-slate-800/70 pt-3">
+        <span id="landing-progress-summary" class="mono">해결 사건: 0건 · 모든 진행 상황 자동 저장됨</span>
+        <button type="button" id="landing-reset-btn" onclick="resetCampaignProgress()" class="hover:text-red-400 underline transition">
+          전체 수사 기록 초기화
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 1. 메인 수사 · 감식 · 교차심문 · 추리 마인드맵 워크스페이스             -->
+  <!-- ===================================================================== -->
+  <div id="game-workspace" class="flex-1 flex flex-col lg:overflow-hidden min-h-0">
+    <header class="bg-[#0b0f17] border-b border-slate-800/90 px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20">
+      <div class="flex items-center gap-2 min-w-0">
+        <button type="button" onclick="backToCampaignBoard()" class="bg-[#141a26] hover:bg-[#1d2638] border border-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs font-bold transition shrink-0">
+          ◀ 브리핑
+        </button>
+        <span id="nav-case-badge" class="bg-amber-600 text-white font-black text-xs px-2.5 py-1 rounded-lg mono shrink-0">CASE 01</span>
+        <h2 id="nav-ep-title" class="font-extrabold text-sm sm:text-base text-white truncate">심야 데이터센터 서버 방화 사건</h2>
+      </div>
+
+      <!-- 4단계 수사 탭 -->
+      <div class="flex items-center gap-1 bg-[#070a10] p-1 rounded-xl border border-slate-800 overflow-x-auto max-w-full">
+        <button type="button" id="tab-btn-scene" onclick="switchTab('scene')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-amber-600 text-white relative shrink-0">
+          🔍 1. 현장 수색
+          <span id="new-zone-dot" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        </button>
+        <button type="button" id="tab-btn-csi" onclick="switchTab('csi')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-400 hover:text-white shrink-0">
+          🔬 2. CSI 감식·결합
+        </button>
+        <button type="button" id="tab-btn-court" onclick="switchTab('court')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-400 hover:text-white shrink-0">
+          ⚖️ 3. 교차·역전 심문
+        </button>
+        <button type="button" id="tab-btn-mindmap" onclick="switchTab('mindmap')" class="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-400 hover:text-white relative shrink-0">
+          🧠 4. 추리 마인드맵
+          <span id="mindmap-ready-dot" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-purple-400 animate-ping"></span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <span id="nav-rep-pill" class="hidden xl:inline-block bg-[#111622] border border-slate-700 text-amber-300 text-[11px] font-bold px-2.5 py-1.5 rounded-lg">
+          ⚖️ 신입 수사관
+        </span>
+        <button type="button" onclick="openNovelReaderForCurrentCase()" class="bg-[#141a26] hover:bg-[#1e2738] border border-amber-700/60 text-amber-300 px-2.5 py-1.5 rounded-lg text-xs font-bold transition">
+          📖 사건 기록서
+        </button>
+        <button type="button" onclick="openNotebookModal()" class="bg-[#141a26] hover:bg-[#1e2738] border border-slate-700 text-amber-300 px-2.5 py-1.5 rounded-lg text-xs font-bold transition">
+          📓 수첩·메모
+        </button>
+        <div class="hidden md:flex items-center gap-1 bg-[#070a10] border border-slate-800 rounded-lg px-2 py-1">
+          <span id="ai-dot" class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+          <input id="gemini-key-input" type="password" placeholder="Gemini API Key (선택)" class="bg-transparent text-[11px] text-slate-200 w-28 focus:outline-none" />
+          <button type="button" onclick="saveGeminiKey()" class="text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 px-2 py-0.5 rounded">적용</button>
+        </div>
+        <button type="button" onclick="toggleTtsVoice()" title="용의자 보이스 TTS 전환" class="bg-[#141a26] hover:bg-[#1e2738] border border-slate-700 px-2 py-1.5 rounded-lg text-xs text-cyan-300 font-bold">
+          <span id="nav-tts-icon">🗣️</span>
+        </button>
+        <div class="flex items-center gap-1.5 bg-[#141a26] border border-slate-700 px-2 py-1 rounded-lg">
+          <button type="button" onclick="toggleAudioEngine()" title="BGM/효과음 음소거 전환" class="hover:text-amber-300 text-xs">
+            <span id="nav-sound-icon">🔇</span>
+          </button>
+          <input id="nav-volume-slider" type="range" min="0" max="100" value="80"
+            oninput="setMasterVolume(this.value)" title="사운드 볼륨 조절"
+            class="w-14 sm:w-20 accent-amber-500 cursor-pointer" />
+          <span id="nav-volume-text" class="mono text-[10px] text-amber-300 font-bold w-7 text-right">80%</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-y-auto lg:overflow-hidden">
+      <!-- 좌측: 확보 증거품 인벤토리 -->
+      <aside class="lg:col-span-3 bg-[#090d15] border-b lg:border-b-0 lg:border-r border-slate-800/90 p-3.5 flex flex-col gap-3 min-h-0 lg:overflow-y-auto scroll-safe">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-extrabold text-amber-400 uppercase tracking-wider">🗂️ 확보 증거품 인벤토리</h3>
+          <span id="inv-count-text" class="mono text-[11px] text-slate-400">0개 확보</span>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-snug">
+          현장에서 채증한 증거를 클릭하세요. [미감식]은 감식실로 이동하고, 감식 완료된 증거는 대화 추궁 시 제시하거나 마인드맵에 배치합니다.
+        </p>
+        <div id="inventory-list" class="flex flex-col gap-2"></div>
+      </aside>
+
+      <!-- 중앙: 4단계 동적 뷰포트 -->
+      <section class="lg:col-span-6 bg-[#06080d] flex flex-col min-h-[500px] lg:min-h-0 relative">
+        <!-- [VIEW 1] 현장 정밀 수색 -->
+        <div id="view-scene" class="flex-1 flex flex-col p-4 gap-3 overflow-y-auto scroll-safe">
+          <div id="tutorial-guide-scene" class="hidden bg-amber-950/75 border border-amber-500/60 text-amber-200 text-xs px-3.5 py-2.5 rounded-xl leading-relaxed"></div>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm font-extrabold text-white">🔍 사건 현장 정밀 수색</h3>
+              <p id="scene-subtitle" class="text-xs text-slate-400 mt-0.5"></p>
+            </div>
+            <span id="scene-phase-badge" class="mono text-[11px] font-bold px-2.5 py-1 rounded-lg bg-cyan-950 text-cyan-300 border border-cyan-700/70">
+              1차 심문 구역 개방
+            </span>
+          </div>
+
+          <div class="relative bg-[#0b101b] border border-slate-800 rounded-2xl overflow-hidden shadow-inner">
+            <svg id="scene-svg-map" viewBox="0 0 400 200" class="w-full h-52 sm:h-60 block"></svg>
+            <div id="scene-pin-layer" class="absolute inset-0"></div>
+          </div>
+
+          <div id="spot-inspector-box" class="bg-[#0d121d] border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col justify-between gap-3">
+            <div class="text-xs text-slate-400 text-center my-auto py-4">
+              도면 위의 빛나는 <strong class="text-amber-400">조사 핀(1, 2...)</strong>을 클릭하여 현장 단서를 채증하세요.
+            </div>
+          </div>
+        </div>
+
+        <!-- [VIEW 2] CSI 과학수사 감식 & 모순 결합 -->
+        <div id="view-csi" class="hidden flex-1 flex flex-col p-4 gap-4 overflow-y-auto scroll-safe">
+          <div class="bg-[#0d121d] border border-slate-800 rounded-2xl p-4">
+            <h3 class="text-sm font-extrabold text-cyan-300 mb-1">🔬 1. 과학수사대(CSI) 정밀 감식</h3>
+            <p class="text-xs text-slate-400 mb-3">[미감식] 증거품을 선택한 뒤 알맞은 과학수사 장비를 가동해 숨겨진 물증을 추출하세요.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              <div class="bg-[#070a10] border border-slate-800 rounded-xl p-3">
+                <span class="text-[10px] text-slate-500 block mb-1">감식 대상 증거</span>
+                <div id="csi-selected-name" class="text-xs font-bold text-amber-300">좌측 또는 우측에서 미감식 증거 선택</div>
+              </div>
+              <div id="csi-unidentified-list" class="flex flex-wrap gap-1.5 items-center"></div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" onclick="runCsiAnalysis('uv')" class="bg-purple-950/70 hover:bg-purple-900 border border-purple-700/70 text-purple-200 text-xs font-bold py-2.5 px-2 rounded-xl transition">
+                🔦 UV 루미놀 스캔
+              </button>
+              <button type="button" onclick="runCsiAnalysis('digital')" class="bg-sky-950/70 hover:bg-sky-900 border border-sky-700/70 text-sky-200 text-xs font-bold py-2.5 px-2 rounded-xl transition">
+                💻 디지털 포렌식
+              </button>
+              <button type="button" onclick="runCsiAnalysis('chem')" class="bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700/70 text-emerald-200 text-xs font-bold py-2.5 px-2 rounded-xl transition">
+                🧪 화학 성분 분석
+              </button>
+              <button type="button" onclick="runCsiAnalysis('micro')" class="bg-amber-950/70 hover:bg-amber-900 border border-amber-700/70 text-amber-200 text-xs font-bold py-2.5 px-2 rounded-xl transition">
+                🔬 초고배율 현미경
+              </button>
+            </div>
+            <div id="csi-feedback" class="mt-2.5 text-xs text-slate-300 min-h-[20px]"></div>
+          </div>
+
+          <div class="bg-[#0d121d] border border-slate-800 rounded-2xl p-4">
+            <h3 class="text-sm font-extrabold text-purple-300 mb-1">⚡ 2. 모순 단서 결합 (COMBINE WORKBENCH)</h3>
+            <p class="text-xs text-slate-400 mb-3">감식이 완료된 연관 증거 2개를 슬롯 A·B에 배치해 결정적 반박 증거(EV-EX)를 도출하세요.</p>
+
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div onclick="clearCombineSlot('A')" class="bg-[#070a10] border border-dashed border-purple-600/60 rounded-xl p-3 cursor-pointer hover:border-purple-400">
+                <span class="text-[10px] text-purple-400 font-bold block">SLOT A (클릭 시 해제)</span>
+                <span id="combine-slot-a" class="text-xs text-slate-300 font-bold mt-1 block">비어 있음</span>
+              </div>
+              <div onclick="clearCombineSlot('B')" class="bg-[#070a10] border border-dashed border-purple-600/60 rounded-xl p-3 cursor-pointer hover:border-purple-400">
+                <span class="text-[10px] text-purple-400 font-bold block">SLOT B (클릭 시 해제)</span>
+                <span id="combine-slot-b" class="text-xs text-slate-300 font-bold mt-1 block">비어 있음</span>
+              </div>
+            </div>
+
+            <div id="combine-candidates" class="flex flex-wrap gap-1.5 mb-3"></div>
+
+            <button type="button" onclick="combineSelectedEvidences()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs py-2.5 rounded-xl shadow transition">
+              ⚡ 두 단서 모순 결합 실행
+            </button>
+            <div id="combine-feedback" class="mt-2 text-xs text-slate-300"></div>
+          </div>
+        </div>
+
+        <!-- [VIEW 3] 복수 용의자·참고인 교차 심문 & 대화 중심형 추궁 -->
+        <div id="view-court" class="hidden flex-1 flex flex-col min-h-0 relative">
+          <!-- 심문 대상 전환 바 (핵심 용의자 ↔ 참고인/공범 교차 심문) -->
+          <div class="bg-[#090d16] border-b border-slate-800 px-3.5 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] font-bold text-slate-400">👥 심문 대상 전환:</span>
+              <button type="button" id="target-btn-suspect" onclick="switchInterrogationTarget('suspect')"
+                class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-amber-600 text-white transition">
+                핵심 용의자
+              </button>
+              <button type="button" id="target-btn-witness" onclick="switchInterrogationTarget('witness')"
+                class="px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+                참고인·공범 교차심문
+              </button>
+            </div>
+            <span id="witness-status-tag" class="mono text-[10px] text-cyan-400">교차 진술 대조 가능</span>
+          </div>
+
+          <div class="bg-[#0d121d] border-b border-slate-800 p-3.5 shrink-0">
+            <div id="tutorial-guide-court" class="hidden bg-amber-950/75 border border-amber-500/60 text-amber-200 text-xs px-3 py-2 rounded-xl mb-2.5 leading-relaxed"></div>
+            <div class="flex items-center justify-between gap-2 mb-1.5">
+              <span id="court-phase-title" class="text-xs font-extrabold text-amber-400">1차 심문</span>
+              <span id="court-stmt-counter" class="mono text-[11px] text-slate-400">증언 1 / 2</span>
+            </div>
+            <div class="bg-[#06080d] border border-slate-700/90 rounded-xl p-3 text-xs sm:text-sm text-emerald-300 font-semibold leading-relaxed">
+              “<span id="court-stmt-text"></span>”
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 mt-2.5">
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="shiftStatement(-1)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-2.5 py-1.5 rounded-lg">◀ 이전</button>
+                <button type="button" onclick="shiftStatement(1)" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-2.5 py-1.5 rounded-lg">다음 ▶</button>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="pressStatement()" class="bg-cyan-700 hover:bg-cyan-600 text-white text-xs font-extrabold px-3.5 py-1.5 rounded-lg transition shadow">
+                  🔍 대화로 파고들기 (PRESS)
+                </button>
+                <span class="hidden sm:inline text-[11px] text-slate-400">※ 증거를 선택한 채 아래 대화창으로 추궁하세요</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="court-selected-banner" class="hidden bg-amber-950/85 border-b border-amber-600/60 px-4 py-1.5 flex items-center justify-between text-xs shrink-0">
+            <span class="text-amber-200 truncate">대화 제시 예정 증거: <strong id="court-selected-ev-name" class="text-amber-300"></strong> (질문 입력 후 추궁 클릭)</span>
+            <button type="button" onclick="clearCourtEvSelection()" class="text-amber-300 hover:text-white text-[11px] px-2">해제 ✕</button>
+          </div>
+
+          <div id="intel-progress-bar" class="bg-[#080c14] border-b border-slate-800/80 px-4 py-1.5 flex items-center justify-between text-[11px] shrink-0">
+            <span class="text-cyan-300 font-bold">🕵️ AI 심문 단서 해금: <span id="intel-count-label" class="mono text-amber-300">0 / 3</span> 핵심 진실 파악</span>
+            <span class="text-slate-400 hidden sm:inline">※ 대화로 모순 진술을 캐낸 뒤 증거와 함께 논리적으로 추궁하세요!</span>
+          </div>
+
+          <div id="interrogation-chat-log" onscroll="onChatScroll()" class="flex-1 p-4 overflow-y-auto scroll-safe flex flex-col gap-3 min-h-0"></div>
+
+          <button type="button" id="chat-bottom-btn" onclick="scrollChatBottom(true)" class="hidden absolute bottom-16 right-4 bg-amber-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-lg z-10">
+            최신 대화로 이동 ↓
+          </button>
+
+          <form onsubmit="submitFreeInterrogation(event)" class="p-2.5 bg-[#0b0f17] border-t border-slate-800 flex flex-wrap sm:flex-nowrap gap-2 shrink-0">
+            <select id="interrogation-tone" class="bg-[#141a26] border border-slate-700 text-slate-200 text-xs rounded-xl px-2.5 py-2 focus:outline-none">
+              <option value="aggressive">⚡ 강압적 추궁</option>
+              <option value="calm">🤝 차분한 유도</option>
+              <option value="sarcastic">😏 냉소적 역심문</option>
+            </select>
+            <input id="free-question-input" type="text" autocomplete="off" placeholder="증언의 시간·동기·모순점을 논리적으로 추궁하거나 증거를 제시하세요..." class="flex-1 bg-[#06080d] border border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+            <button id="btn-send-question" type="submit" class="bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white font-extrabold text-xs px-4 py-2 rounded-xl shrink-0">
+              추궁
+            </button>
+          </form>
+        </div>
+
+        <!-- [VIEW 4] 추리 보드 / 마인드 맵 (DEDUCTION WEB) -->
+        <div id="view-mindmap" class="hidden flex-1 flex flex-col p-4 gap-4 overflow-y-auto scroll-safe">
+          <div class="bg-[#0d121d] border border-purple-700/60 rounded-2xl p-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+              <h3 class="text-sm font-extrabold text-purple-300">🧠 사건 재구성 마인드 맵 (DEDUCTION WEB)</h3>
+              <span id="mindmap-status-badge" class="mono text-[11px] font-bold px-2.5 py-0.5 rounded bg-slate-800 text-slate-300">
+                3대 범죄 요건 연결 대기
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              확보 및 감식이 끝난 증거들을 아래 3가지 핵심 범죄 구성 요건(<strong class="text-amber-300">① 범행 동기 · ② 범행 수단/물증 · ③ 알리바이 붕괴</strong>)에 연결하여 사건의 전말을 완성하세요!
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- 노드 1: 동기 -->
+            <div onclick="assignSelectedToMindmap('motive')" class="bg-[#0b101b] hover:bg-[#111827] border-2 border-dashed border-amber-600/60 rounded-2xl p-4 cursor-pointer transition flex flex-col justify-between gap-3">
+              <div>
+                <span class="mono text-[10px] font-black text-amber-400 block mb-1">NODE 01 // MOTIVE</span>
+                <h4 class="text-xs font-extrabold text-white mb-2">🔥 범행 동기 (WHY)</h4>
+                <div id="mm-slot-motive" class="bg-[#06080d] border border-slate-800 rounded-xl p-3 text-xs text-slate-400 min-h-[64px] flex items-center justify-center text-center">
+                  [비어 있음] 좌측 인벤토리에서 증거 선택 후 클릭
+                </div>
+              </div>
+              <span class="text-[10px] text-slate-500 text-right">클릭하여 배치 / 해제</span>
+            </div>
+
+            <!-- 노드 2: 수단 -->
+            <div onclick="assignSelectedToMindmap('means')" class="bg-[#0b101b] hover:bg-[#111827] border-2 border-dashed border-cyan-600/60 rounded-2xl p-4 cursor-pointer transition flex flex-col justify-between gap-3">
+              <div>
+                <span class="mono text-[10px] font-black text-cyan-400 block mb-1">NODE 02 // MEANS</span>
+                <h4 class="text-xs font-extrabold text-white mb-2">🛠️ 범행 수단 및 결정적 물증 (HOW)</h4>
+                <div id="mm-slot-means" class="bg-[#06080d] border border-slate-800 rounded-xl p-3 text-xs text-slate-400 min-h-[64px] flex items-center justify-center text-center">
+                  [비어 있음] 좌측 인벤토리에서 증거 선택 후 클릭
+                </div>
+              </div>
+              <span class="text-[10px] text-slate-500 text-right">클릭하여 배치 / 해제</span>
+            </div>
+
+            <!-- 노드 3: 기회/알리바이 붕괴 -->
+            <div onclick="assignSelectedToMindmap('opportunity')" class="bg-[#0b101b] hover:bg-[#111827] border-2 border-dashed border-rose-600/60 rounded-2xl p-4 cursor-pointer transition flex flex-col justify-between gap-3">
+              <div>
+                <span class="mono text-[10px] font-black text-rose-400 block mb-1">NODE 03 // OPPORTUNITY</span>
+                <h4 class="text-xs font-extrabold text-white mb-2">⏱️ 알리바이 붕괴 (WHEN/WHERE)</h4>
+                <div id="mm-slot-opportunity" class="bg-[#06080d] border border-slate-800 rounded-xl p-3 text-xs text-slate-400 min-h-[64px] flex items-center justify-center text-center">
+                  [비어 있음] 좌측 인벤토리에서 증거 선택 후 클릭
+                </div>
+              </div>
+              <span class="text-[10px] text-slate-500 text-right">클릭하여 배치 / 해제</span>
+            </div>
+          </div>
+
+          <div class="bg-[#0d121d] border border-slate-800 rounded-2xl p-4 flex flex-col gap-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-slate-300">🔗 논리 연결망 검증</span>
+              <span id="mm-hint-text" class="text-[11px] text-slate-400">감식이 완료된 증거 3개를 각 요건에 맞게 배치하세요.</span>
+            </div>
+            <button type="button" onclick="verifyDeductionMindmap()"
+              class="w-full bg-gradient-to-r from-purple-600 to-amber-600 hover:from-purple-500 hover:to-amber-500 text-white font-black text-xs sm:text-sm py-3 rounded-xl shadow-lg transition">
+              ⚖️ 추리 마인드맵 완성 및 최종 자백 압박 실행
+            </button>
+            <div id="mindmap-feedback" class="text-xs text-slate-300"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 우측: 심문 대상 포트레이트 & 심전도 & 수사 신뢰도 -->
+      <aside class="lg:col-span-3 bg-[#090d15] border-t lg:border-t-0 lg:border-l border-slate-800/90 p-3.5 flex flex-col justify-between gap-3 min-h-0 lg:overflow-y-auto scroll-safe">
+        <div class="flex flex-col gap-3">
+          <div class="bg-[#0e131e] border border-slate-800 rounded-2xl p-4 text-center relative">
+            <span id="portrait-case-id" class="mono text-[10px] text-slate-500 absolute top-2.5 right-3">CASE // 01</span>
+            <div id="suspect-portrait-box" class="w-24 h-24 mx-auto rounded-2xl border-2 border-slate-700 overflow-hidden mb-2.5 shadow-lg"></div>
+            <h3 id="portrait-name" class="font-extrabold text-base text-white">용의자</h3>
+            <p id="portrait-role" class="text-xs text-slate-400 mt-0.5">직책</p>
+            <div class="mt-2.5 inline-flex items-center gap-1.5 bg-[#06080d] border border-slate-800 px-3 py-1 rounded-full text-xs">
+              <span class="text-slate-400">심리 상태:</span>
+              <span id="portrait-mood-text" class="font-extrabold text-amber-400">침착함</span>
+            </div>
+          </div>
+
+          <div class="bg-[#0e131e] border border-slate-800 rounded-2xl p-3">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="text-rose-400 font-bold flex items-center gap-1">💓 생체 심박수 (ECG)</span>
+              <span id="bpm-value-text" class="mono font-black text-rose-400">74 BPM</span>
+            </div>
+            <canvas id="ecg-canvas" width="240" height="54" class="w-full h-14 bg-[#06080d] rounded-xl border border-slate-800/80"></canvas>
+          </div>
+
+          <div class="bg-[#0e131e] border border-slate-800 rounded-2xl p-3">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="text-amber-400 font-bold">🔥 추궁 심리 압박도</span>
+              <span id="pressure-value-text" class="mono font-bold text-amber-300">0%</span>
+            </div>
+            <div class="w-full h-2.5 bg-[#06080d] rounded-full overflow-hidden border border-slate-800">
+              <div id="pressure-bar" class="h-full bg-gradient-to-r from-amber-500 to-red-500 transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="bg-[#0e131e] border border-slate-800 rounded-2xl p-3">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="text-slate-200 font-bold">🛡️ 수사 신뢰도 (잔여 기회)</span>
+              <span id="hp-text" class="mono font-bold text-emerald-400">5 / 5</span>
+            </div>
+            <div id="hp-hearts" class="flex gap-1.5 text-base"></div>
+          </div>
+        </div>
+
+        <button type="button" onclick="restartCurrentStage()" class="w-full bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-300 font-bold text-xs py-2.5 rounded-xl transition">
+          ↺ 현재 사건 재시작
+        </button>
+      </aside>
+    </main>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 3. 수사 수첩 · 증거 핀보드 · 자유 메모장 모달                          -->
+  <!-- ===================================================================== -->
+  <div id="notebook-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0e131e] border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[88vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="px-5 py-3.5 bg-[#141b2b] border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <h3 class="font-extrabold text-sm sm:text-base text-amber-400">📓 수사관 수첩</h3>
+          <div class="flex gap-1 bg-[#090d16] p-1 rounded-lg border border-slate-800 text-[11px]">
+            <button type="button" id="nb-tab-timeline" onclick="switchNotebookTab('timeline')" class="px-2.5 py-1 rounded bg-amber-600 text-white font-bold">⏱️ 타임라인</button>
+            <button type="button" id="nb-tab-pinboard" onclick="switchNotebookTab('pinboard')" class="px-2.5 py-1 rounded text-slate-300 hover:text-white font-bold">📌 증거 핀보드</button>
+            <button type="button" id="nb-tab-memo" onclick="switchNotebookTab('memo')" class="px-2.5 py-1 rounded text-slate-300 hover:text-white font-bold">📝 자유 메모장</button>
+          </div>
+        </div>
+        <button type="button" onclick="closeNotebookModal()" class="text-slate-400 hover:text-white px-2 py-1">✕</button>
+      </div>
+
+      <div id="nb-view-timeline" class="p-5 overflow-y-auto flex flex-col gap-3 text-xs">
+        <h4 class="font-extrabold text-cyan-300">⏱️ 사건 당일 공식 타임라인</h4>
+        <div id="notebook-timeline-list" class="flex flex-col gap-1.5"></div>
+      </div>
+
+      <div id="nb-view-pinboard" class="hidden p-5 overflow-y-auto flex flex-col gap-3 text-xs">
+        <h4 class="font-extrabold text-purple-300">📌 확보 증거 & 심문 첩보 핀보드</h4>
+        <div id="notebook-pinboard-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+      </div>
+
+      <div id="nb-view-memo" class="hidden p-5 overflow-y-auto flex flex-col gap-3 text-xs">
+        <div class="flex items-center justify-between">
+          <h4 class="font-extrabold text-emerald-300">📝 수사관 개인 추리 메모장 (자동 저장)</h4>
+          <span id="memo-save-status" class="text-[11px] text-slate-400">입력 즉시 자동 저장됨</span>
+        </div>
+        <textarea id="detective-memo-textarea" rows="9" oninput="saveCaseMemo()"
+          placeholder="여기에 용의자의 말실수, 타임라인 계산(예: 23:12 - 22:50 = 22분), 참고인 증언 모순 등을 자유롭게 기록하세요..."
+          class="w-full bg-[#070a10] border border-slate-700 rounded-xl p-3.5 text-xs sm:text-sm text-amber-100 leading-relaxed focus:outline-none focus:border-amber-500"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 4. 자백 붕괴 컷인 & 멀티 엔딩 분기 모달                               -->
+  <!-- ===================================================================== -->
+  <div id="confession-modal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-[#111622] border-2 border-red-600/80 rounded-2xl max-w-xl w-full p-6 sm:p-7 text-center shadow-[0_0_60px_rgba(220,38,38,0.45)] relative overflow-hidden my-auto">
+      <div id="conf-stamp-wrap" class="hidden pointer-events-none absolute inset-0 flex items-center justify-center z-20">
+        <div id="conf-stamp-text" class="border-4 border-red-500 text-red-500 font-black text-2xl sm:text-3xl px-6 py-2.5 rounded-xl bg-red-950/85 tracking-widest shadow-2xl">
+          진술서 서명 확정
+        </div>
+      </div>
+
+      <span id="conf-ep-tag" class="mono text-[11px] font-black text-red-400 tracking-widest uppercase">CASE 01</span>
+      <div id="conf-portrait-box" class="w-24 h-24 mx-auto my-3 rounded-2xl border-2 border-red-500 overflow-hidden shadow-lg"></div>
+      <h3 id="conf-name" class="text-xl font-black text-white">용의자 자백</h3>
+      <p id="conf-role" class="text-xs text-slate-400 mb-3"></p>
+
+      <div class="bg-[#070a10] border border-slate-800 rounded-xl p-4 text-left text-xs sm:text-sm text-slate-200 italic leading-relaxed mb-3">
+        <span id="conf-quote"></span>
+      </div>
+
+      <div id="conf-hidden-box" class="bg-amber-950/35 border border-amber-600/50 rounded-xl p-3.5 text-left text-xs text-amber-100 leading-relaxed mb-4">
+        <span class="font-extrabold text-amber-400 block mb-1">🕯️ 사건의 감춰진 이면 (HIDDEN TRUTH)</span>
+        <span id="conf-hidden-text"></span>
+      </div>
+
+      <div id="conf-ending-btns" class="flex flex-col gap-2.5 text-left">
+        <p id="conf-choice-prompt" class="text-xs text-amber-400 font-extrabold text-center mb-1">
+          ⚖️ 수사관의 최종 결단 (이 선택은 당신의 수사 평판과 이후 사건에 반영됩니다)
+        </p>
+        <button type="button" onclick="confirmEndingChoice('A')"
+          class="bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-500/70 p-3.5 rounded-xl transition group">
+          <span id="conf-opt-a-title" class="block text-xs sm:text-sm font-extrabold text-emerald-300 group-hover:text-white">[엔딩 A] 원칙적 법 집행: 구속 및 기소</span>
+          <span id="conf-opt-a-desc" class="block text-[11px] text-slate-300 mt-0.5">모든 증거와 자백 조서를 검찰에 송치하여 법의 심판을 받게 합니다.</span>
+        </button>
+        <button type="button" onclick="confirmEndingChoice('B')"
+          class="bg-purple-950/90 hover:bg-purple-900 border border-purple-500/70 p-3.5 rounded-xl transition group">
+          <span id="conf-opt-b-title" class="block text-xs sm:text-sm font-extrabold text-purple-300 group-hover:text-white">[엔딩 B] 어둠의 거래: 진실 은폐 및 정보 확보</span>
+          <span id="conf-opt-b-desc" class="block text-[11px] text-slate-300 mt-0.5">핵심 증거를 덮어주는 대가로 배후 조직의 비밀 자금줄과 단서를 받아냅니다.</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 5. 사건 스토리텔링 시어터 (오프닝 사건 발생 & 엔딩 진실 해명 컷신)       -->
+  <!-- ===================================================================== -->
+  <div id="story-theater-modal" class="hidden fixed inset-0 z-50 bg-[#04060a]/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#0d121d] border border-amber-500/50 rounded-2xl max-w-2xl w-full overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.95)] flex flex-col">
+      <div class="px-5 py-3.5 bg-[#131a29] border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span id="story-mode-badge" class="mono text-[10px] font-black px-2.5 py-0.5 rounded bg-amber-600 text-white">CASE PROLOGUE</span>
+          <h3 id="story-theater-title" class="font-extrabold text-sm sm:text-base text-white">사건 파일 브리핑</h3>
+        </div>
+        <span id="story-scene-counter" class="mono text-xs text-slate-400">1 / 3</span>
+      </div>
+
+      <div class="p-5 sm:p-6 bg-gradient-to-b from-[#090d16] to-[#0d121d] flex flex-col gap-4">
+        <div class="flex items-center gap-4 bg-[#070a10] border border-slate-800/90 rounded-2xl p-4">
+          <div id="story-speaker-avatar" class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl border border-slate-700 overflow-hidden shrink-0 flex items-center justify-center bg-[#0f1624] text-3xl">
+            📁
+          </div>
+          <div class="flex-1 min-w-0">
+            <div id="story-location-tag" class="mono text-[10px] text-amber-400 font-bold mb-1">LOCATION // UNKNOWN</div>
+            <div id="story-speaker-name" class="font-extrabold text-sm sm:text-base text-white">사건 기록관</div>
+            <p id="story-sub-caption" class="text-[11px] text-slate-400 mt-0.5 truncate">심문실 404 특별 수사 기록</p>
+          </div>
+        </div>
+
+        <div class="bg-[#06080d] border border-slate-800 rounded-2xl p-4 sm:p-5 min-h-[125px] flex flex-col justify-between">
+          <p id="story-body-text" class="text-xs sm:text-sm text-slate-100 leading-relaxed whitespace-pre-line"></p>
+          <div class="flex items-center justify-between pt-4 mt-3 border-t border-slate-800/70">
+            <button type="button" onclick="skipStoryTheater()" class="text-[11px] text-slate-500 hover:text-slate-300 underline">
+              전체 스킵 ⏭
+            </button>
+            <button type="button" id="story-next-btn" onclick="nextStorySlide()"
+              class="bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow transition">
+              다음 장면 ▶
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 5-B. 사건 전말 소설책 리더 (CASE NOVEL BOOK READER)                     -->
+  <!-- ===================================================================== -->
+  <div id="novel-book-modal" class="hidden fixed inset-0 z-[55] bg-[#040508]/95 backdrop-blur-md flex items-center justify-center p-3 sm:p-5">
+    <div class="bg-[#14110e] border-2 border-amber-700/60 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-[0_0_90px_rgba(0,0,0,0.95)]">
+      <!-- 책 상단 제본 바 -->
+      <div class="px-5 py-3.5 bg-[#1c1712] border-b border-amber-900/50 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="text-lg">📖</span>
+          <div class="min-w-0">
+            <span id="novel-book-kicker" class="mono text-[10px] text-amber-400 font-bold block tracking-widest uppercase">SHADOW ARCHIVE // COMPLETE CHRONICLE</span>
+            <h3 id="novel-book-title" class="font-black text-sm sm:text-base text-amber-100 truncate">사건 전말 기록서</h3>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span id="novel-page-indicator" class="mono text-xs text-amber-300 bg-black/40 border border-amber-800/60 px-2.5 py-1 rounded-lg">1 / 5 장</span>
+          <button type="button" onclick="closeNovelBookModal()" class="text-amber-300/80 hover:text-white text-xs font-bold px-2.5 py-1 rounded-lg border border-amber-900/50">닫기 ✕</button>
+        </div>
+      </div>
+
+      <!-- 책 본문 양피지 페이지 -->
+      <div id="novel-page-container" class="flex-1 overflow-y-auto p-6 sm:p-9 bg-gradient-to-b from-[#17130f] via-[#13100d] to-[#0f0c0a] text-amber-50/95">
+        <div id="novel-page-anim-box" class="max-w-2xl mx-auto flex flex-col gap-5">
+          <div class="border-b border-amber-800/40 pb-3 flex flex-wrap items-baseline justify-between gap-2">
+            <span id="novel-chapter-tag" class="mono text-xs text-amber-400 font-bold tracking-widest">CHAPTER I</span>
+            <span id="novel-chapter-loc" class="mono text-[11px] text-amber-200/60">2026.11 // ARCHIVE</span>
+          </div>
+          <h4 id="novel-chapter-heading" class="serif-novel text-xl sm:text-2xl font-bold text-amber-200 leading-snug">
+            제1장. 어둠 속의 서막
+          </h4>
+          <div id="novel-chapter-body" class="serif-novel text-sm sm:text-base text-stone-200 leading-[1.95] whitespace-pre-line tracking-wide">
+          </div>
+          <div id="novel-chapter-quote-box" class="hidden mt-2 border-l-2 border-amber-500/70 pl-4 py-1.5 bg-amber-950/20 rounded-r-lg">
+            <p id="novel-chapter-quote" class="serif-novel italic text-xs sm:text-sm text-amber-200/90 leading-relaxed"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 책 하단 페이지 넘김 컨트롤 -->
+      <div class="px-5 py-3.5 bg-[#1c1712] border-t border-amber-900/50 flex items-center justify-between gap-2">
+        <button type="button" id="novel-prev-btn" onclick="turnNovelPage(-1)"
+          class="bg-stone-800 hover:bg-stone-700 disabled:opacity-35 text-amber-100 font-bold text-xs px-4 py-2.5 rounded-xl transition">
+          ◀ 이전 페이지
+        </button>
+        <div id="novel-page-dots" class="flex items-center gap-1.5"></div>
+        <button type="button" id="novel-next-btn" onclick="turnNovelPage(1)"
+          class="bg-amber-700 hover:bg-amber-600 text-white font-extrabold text-xs px-5 py-2.5 rounded-xl shadow transition">
+          다음 페이지 ▶
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 6. 사건 해결 결과 정산 모달                                            -->
+  <!-- ===================================================================== -->
+  <div id="result-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#111622] border border-slate-700 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
+      <div id="res-icon" class="text-5xl mb-2">⚖️</div>
+      <div id="res-tag" class="inline-block mono text-[11px] font-black px-3 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-700 mb-2">
+        CASE SOLVED
+      </div>
+      <h3 id="res-title" class="text-xl font-black text-white mb-2">사건 해결 완료!</h3>
+      <p id="res-desc" class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-3"></p>
+      <div id="res-epilogue-box" class="bg-[#090d16] border border-amber-700/40 rounded-xl p-3 text-left text-[11px] text-amber-200/90 leading-relaxed mb-4"></div>
+
+      <div class="bg-[#070a10] border border-slate-800 rounded-xl p-3.5 mb-5 grid grid-cols-3 gap-2 text-xs">
+        <div>
+          <span class="text-slate-500 block">수사 랭크</span>
+          <span id="res-rank" class="mono text-xl font-black text-amber-400">S</span>
+        </div>
+        <div class="border-x border-slate-800">
+          <span class="text-slate-500 block">남은 신뢰도</span>
+          <span id="res-hp" class="mono text-base font-extrabold text-rose-400">5 / 5</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block">오답 횟수</span>
+          <span id="res-mistakes" class="mono text-base font-extrabold text-slate-200">0회</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <button type="button" id="res-read-novel-btn" onclick="openNovelReaderForCurrentCase()"
+          class="w-full bg-[#241c14] hover:bg-[#33271c] border border-amber-500/70 text-amber-200 font-extrabold py-2.5 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2">
+          <span>📖</span>
+          <span>사건 전말 소설책 다시 읽기</span>
+        </button>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <button type="button" id="res-retry-btn" onclick="restartCurrentStage()"
+            class="hidden flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 rounded-xl text-xs sm:text-sm transition">
+            ↺ 다시 수사하기
+          </button>
+          <button type="button" id="res-next-btn" onclick="proceedNextStage()"
+            class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-extrabold py-2.5 rounded-xl text-xs sm:text-sm transition shadow-lg">
+            4개 사건 출동 보드로 이동 ▶
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- 7. 신문 호외 속보 (BREAKING NEWS) 컷신 모달                           -->
+  <!-- ===================================================================== -->
+  <div id="newspaper-modal" class="hidden fixed inset-0 z-[70] bg-black/92 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#e8e2d5] text-[#141414] border-4 border-[#1f1f1f] rounded-2xl max-w-xl w-full p-6 sm:p-7 shadow-[0_0_80px_rgba(0,0,0,0.95)] relative">
+      <div class="flex items-center justify-between border-b-2 border-[#1f1f1f] pb-2 mb-3 text-[11px] font-black mono">
+        <span>SPECIAL EDITION // 호외 속보</span>
+        <span id="news-date">2026.11.25</span>
+      </div>
+      <div class="text-center border-b-2 border-[#1f1f1f] pb-3 mb-4">
+        <div id="news-kicker" class="inline-block bg-[#991b1b] text-white text-[11px] font-black px-2.5 py-0.5 mb-2 tracking-widest">
+          BREAKING NEWS
+        </div>
+        <h3 id="news-headline" class="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-[#0f0f0f]">
+          속보: 새로운 미스터리 사건 발생
+        </h3>
+      </div>
+      <p id="news-body" class="text-xs sm:text-sm leading-relaxed text-[#262626] font-medium mb-5 whitespace-pre-line"></p>
+      <button type="button" onclick="confirmNewspaperAndOpenBoard()"
+        class="w-full bg-[#141414] hover:bg-[#292929] text-[#f5f0e6] font-black text-sm py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+        <span>📂</span>
+        <span id="news-cta-label">4개 사건 출동 보드 확인 ▶</span>
+      </button>
+    </div>
+  </div>
+
+<script>
+// ============================================================================
+// 1. 캠페인 데이터 & 상태 관리 (1번 튜토리얼 → 2번부터 4개 사건 연속 선택 보드)
+// ============================================================================
+const SAVE_KEY = "r404_shadow_archive_v3";
+
+const STAGE_DATA = [
+  {
+    num: 1,
+    isTutorial: true,
+    difficulty: "★☆☆☆☆ [TUTORIAL]",
+    category: "TUTORIAL // SYSTEM GUIDE",
+    title: "심야 데이터센터 서버 방화 사건",
+    subtitle: "[튜토리얼] 현장 수색 · CSI 감식 · 교차 심문 · 추리 마인드맵 가이드",
+    summary: "23:15 판교 데이터센터 제3서버실에서 화재가 발생해 비리 감사 백업 서버가 전소되었다. 보안관제팀장 서진호는 23:00 정각 퇴근했다고 주장한다.",
+    hiddenTruth: "서진호가 불태운 서버에는 회사 임원진이 불법 개인정보 매매의 책임을 과로사한 신입 후배에게 뒤집어씌우려 조작한 내부 문서가 들어 있었다.",
+    epilogueA: "서진호는 방화 및 증거인멸 혐의로 구속되었지만, 법정에서 폭로된 임원진의 문서 조작 음모 역시 세상에 드러나며 후배의 명예가 회복되었다.",
+    epilogueB: "당신은 서진호의 자백 조서를 덮어주는 대가로 임원진의 비자금 서버 백업 키와 'OMEGA'의 첫 단서를 손에 넣었다.",
+    tutorialGuide: {
+      court0: "💡 [튜토리얼 안내] 좌측 인벤토리에서 감식된 증거를 선택한 뒤 아래 대화창에 모순점(예: '23:12 홍채 인증 기록' 또는 '시너 발화점')을 입력해 추궁하세요!"
+    },
+    suspect: {
+      name: "서진호 (39세)",
+      role: "데이터센터 보안관제팀장",
+      themeColor: "#38bdf8",
+      coatColor: "#1e293b",
+      hairColor: "#0f172a",
+      hasGlasses: true,
+      voicePitch: 0.95,
+      voiceRate: 1.0,
+      openingLine: "형사님, 전 23:00 정각에 정문으로 퇴근했습니다. 화재는 노후 배전반의 단순 누전 사고입니다.",
+      finalConfession: "홍채 출입 로그와 가운 소매의 공업용 시너 잔류물까지 찾아내시다니... 후배의 누명을 지우려 서버를 불태웠습니다.",
+      winSummary: "[튜토리얼 완료] 현장 수색, CSI 감식, 교차 심문, 추리 마인드맵까지 전체 수사 절차를 완수했습니다!",
+      loseSummary: "서진호의 알리바이를 돌파하지 못해 수사가 중단되었습니다."
+    },
+    witness: {
+      name: "박도윤 (27세)",
+      role: "야간 방재실 경비원",
+      themeColor: "#34d399",
+      coatColor: "#134e4a",
+      hairColor: "#1e293b",
+      hasGlasses: false,
+      voicePitch: 1.15,
+      voiceRate: 1.08,
+      testimony: "전 23시쯤 순찰을 돌았는데 제3서버실 복도엔 아무도 없었습니다.",
+      contradictionHint: "사실 23:10경 비상 계단 쪽에서 시너 냄새와 발소리를 들었지만 팀장님이 무서워 못 본 척했습니다.",
+      keywords: ["비상", "계단", "시너", "냄새", "23:10", "팀장"],
+      unlockEvId: "ev1_witness",
+      breakReply: "죄송합니다 형사님! 사실 23시 10분경 비상 계단에서 서진호 팀장님이 기름통을 들고 내려가는 걸 봤습니다!"
+    },
+    timeline: [
+      { time: "22:50", event: "임원진 감사팀, 제3서버실 조작 감사 보고서 업로드" },
+      { time: "23:00", event: "서진호 팀장 정문 퇴근 카드 태그 (알리바이 위장)" },
+      { time: "23:12", event: "제3서버실 비상문 홍채 리더기 인증 및 화재 경보 발령" }
+    ],
+    scene: {
+      rooms: [
+        { x: 18, y: 18, w: 170, h: 75, label: "제3서버실 배전반", color: "#f87171", unlockPhase: 0 },
+        { x: 212, y: 18, w: 170, h: 75, label: "비상문 홍채 단말기", color: "#38bdf8", unlockPhase: 0 },
+        { x: 18, y: 108, w: 364, h: 74, label: "보안팀장 개인 라커 [2차 심문 개방]", color: "#a855f7", unlockPhase: 1 }
+      ],
+      hotspots: [
+        {
+          id: "hs1_1", num: 1, x: 100, y: 56, unlockPhase: 0,
+          title: "전소된 서버실 배전반 잔해",
+          detail: "단순 전기 누전이라기엔 인화성 액체가 연소된 그을음 패턴이 뚜렷하다.",
+          evId: "ev1_thinner"
+        },
+        {
+          id: "hs1_2", num: 2, x: 295, y: 56, unlockPhase: 0,
+          title: "비상문 생체 홍채 리더기",
+          detail: "정문 퇴근 12분 뒤인 23:12에 서진호의 홍채로 문이 열린 기록.",
+          evId: "ev1_iris"
+        },
+        {
+          id: "hs1_3", num: 3, x: 200, y: 145, unlockPhase: 1,
+          title: "[2차 개방] 조작 감사 보고서 백업 드라이브",
+          detail: "후배에게 비리를 뒤집어씌우려 작성된 임원진의 조작 문건 원본.",
+          evId: "ev1_motive"
+        }
+      ]
+    },
+    evidences: [
+      {
+        id: "ev1_thinner", code: "EV-01",
+        name: "배전반 그을음 채취 면봉",
+        desc: "[미감식] 발화 지점에서 채취한 탄화 잔여물 시료.",
+        analyzed: false, requiredTool: "chem",
+        analyzedName: "공업용 시너 인화물 검출 감정서",
+        analyzedDesc: "전기 누전이 아닌 고순도 공업용 시너를 뿌려 고의로 방화한 화학 감정 결과."
+      },
+      {
+        id: "ev1_iris", code: "EV-02",
+        name: "23:12 비상문 홍채 출입 로그",
+        desc: "23:00 정문 퇴근 후 비상 계단으로 재침입해 23:12 홍채 인증으로 서버실에 들어간 기록.",
+        analyzed: true
+      },
+      {
+        id: "ev1_motive", code: "EV-03",
+        name: "조작된 비리 감사 문건 사본",
+        desc: "고인이 된 후배에게 불법 매매 책임을 전가하려던 내부 문건. 서진호가 서버를 불태운 결정적 동기.",
+        analyzed: true
+      },
+      {
+        id: "ev1_witness", code: "EV-W1",
+        name: "[교차진술] 경비원 박도윤 목격 진술서",
+        desc: "23:10 비상 계단에서 기름통을 들고 이동하던 서진호를 목격했다는 참고인 진술.",
+        analyzed: true
+      }
+    ],
+    mindmapSolution: {
+      motive: "ev1_motive",
+      means: "ev1_thinner",
+      opportunity: "ev1_iris"
+    },
+    testimonyPhases: [
+      {
+        title: "1차 심문: 누전 사고 및 퇴근 주장",
+        statements: [
+          {
+            id: "st1_1",
+            text: "서버실 화재는 노후 배전반의 단순 전기 누전 때문에 발생한 사고입니다.",
+            keywords: ["시너", "방화", "인화", "화학", "배전반", "누전"],
+            pressReply: "배전반이 오래되어 평소에도 스파크가 자주 튀었습니다!",
+            contradictsWith: "ev1_thinner",
+            breakReply: "공업용 시너 인화물이 검출됐다고요?! 그, 그건 청소 용역업체가 흘린..."
+          }
+        ]
+      },
+      {
+        title: "2차 심문: 알리바이 및 동기 돌파",
+        statements: [
+          {
+            id: "st1_2",
+            text: "설령 방화라 해도 전 23시에 정문으로 퇴근했습니다! 제가 불을 지를 이유도 없잖습니까!",
+            keywords: ["23:12", "홍채", "비상문", "후배", "조작", "감사", "동기"],
+            pressReply: "정문 출입 기록을 확인해 보십시오. 전 23시 정각에 퇴근했습니다!",
+            contradictsWith: "ev1_iris",
+            breakReply: "23시 12분 비상문 홍채 로그와 조작 감사 문건까지 전부 찾아내셨군요..."
+          }
+        ]
+      }
+    ],
+    novelChapters: [
+      {
+        tag: "CHAPTER I // 잿더미 속의 비명",
+        loc: "2026.11.24 23:15 · 판교 데이터센터",
+        heading: "제1장. 23시 12분의 붉은 불꽃",
+        body: "차가운 빗줄기가 쏟아지던 밤, 판교 데이터센터 제3서버실의 비상 경보음이 정적을 찢었다.\n\n보안관제팀장 서진호는 23시 정각에 정문 스피드게이트를 통과하며 완벽한 퇴근 알리바이를 남겼다. 하지만 12분 뒤, 아무도 없어야 할 제3서버실 비상문의 홍채 리더기가 그의 눈동자를 인식했다.",
+        quote: "“불길 속에 태워버려야만 지킬 수 있는 이름이 있었습니다.”"
+      },
+      {
+        tag: "CHAPTER II // 감춰진 진실",
+        loc: "심문실 404 · 녹화 기록",
+        heading: "제2장. 죄 없는 후배를 지키기 위한 방화",
+        body: "임원진은 불법 개인정보 매매가 적발될 위기에 처하자, 지난달 과로로 세상을 떠난 신입 연구원에게 모든 책임을 뒤집어씌우는 감사 조작 문건을 제3서버실에 업로드했다.\n\n그 사실을 알게 된 서진호는 후배의 유가족마저 범죄자 가족으로 낙인찍히는 것을 막기 위해 스스로 방화범이 되기를 선택했다."
+      }
+    ],
+    newspaper: {
+      date: "2026.11.25",
+      kicker: "TUTORIAL CLEARED // 출동 보드 개방",
+      headline: "데이터센터 방화 전말 규명… 연쇄 미스터리 4대 사건 동시 발생",
+      body: "심문실 404 특별수사팀이 판교 데이터센터 방화 사건의 배후 진실을 밝혀냈다.\n한편, 서울 전역에서 4건의 기묘한 미해결 사건이 동시에 접수되며 출동 보드가 전면 개방되었다."
+    }
+  },
+
+  {
+    num: 2,
+    isTutorial: false,
+    difficulty: "★★☆☆☆",
+    category: "ART HEIST // 청담 고미술관",
+    title: "청담 미술관 청자 도난 사건",
+    subtitle: "청담 고미술관 특별 전시관 및 감정사 개인 공방 도면",
+    summary: "국보급 고려청자가 모조품으로 바뀌었다. 수석 감정사 윤서아는 마스터키를 분실했다고 주장한다.",
+    hiddenTruth: "재벌 이사장이 진품 청자를 해외 비밀 경매로 밀반출하려 하자, 독립운동가 후손인 윤서아가 가짜를 진열장에 넣어 밀반출을 저지하려 했다.",
+    epilogueA: "윤서아는 절도 혐의로 기소되었으나, 그녀가 지켜낸 진품 청자는 국가 문화재청 보호 수장고로 안전하게 이관되었다.",
+    epilogueB: "당신은 진품 반환 조건으로 윤서아의 입건 기록을 말소하고, 밀반출을 알선한 브로커 'OMEGA'의 암호 계좌를 확보했다.",
+    suspect: {
+      name: "윤서아 (35세)",
+      role: "청담 고미술관 수석 감정사",
+      themeColor: "#a855f7",
+      coatColor: "#311042",
+      hairColor: "#1e1b4b",
+      hasGlasses: false,
+      voicePitch: 1.18,
+      voiceRate: 1.02,
+      openingLine: "형사님, 어제 퇴근길에 진열장 마스터키를 잃어버렸습니다. 누군가 주워서 바꿔치기한 겁니다.",
+      finalConfession: "모조품 바닥의 UV 형광 낙관과 제 공방 유약 성분까지 찾아내시다니... 해외 밀반출만은 막고 싶었습니다.",
+      winSummary: "청담 고미술관 청자 위작 사건의 전말과 이사장의 밀반출 음모까지 모두 밝혀냈습니다!",
+      loseSummary: "윤서아의 알리바이를 무너뜨리지 못해 진품 청자의 행방이 묘연해졌습니다."
+    },
+    witness: {
+      name: "최민재 (44세)",
+      role: "미술관 야간 관제 기사",
+      themeColor: "#38bdf8",
+      coatColor: "#1e293b",
+      hairColor: "#0f172a",
+      hasGlasses: true,
+      voicePitch: 0.92,
+      voiceRate: 0.98,
+      testimony: "야간 순찰 중엔 특이사항이 없었습니다. 경보도 울리지 않았고요.",
+      contradictionHint: "사실 01:05경 후문 배수구 앞에서 윤서아 감정사님과 마주쳤지만 그냥 지나쳤습니다.",
+      keywords: ["후문", "배수구", "01:05", "마주", "열쇠"],
+      unlockEvId: "ev2_witness",
+      breakReply: "사실 01시 05분경 후문 배수구 쪽에서 윤서아 감정사님이 무언가를 버리는 걸 봤습니다!"
+    },
+    timeline: [
+      { time: "00:50", event: "진열장 보안 센서, 원본 마스터키로 정상 개폐 기록" },
+      { time: "01:05", event: "후문 배수구에서 마스터키 투기 정황 포착" },
+      { time: "01:40", event: "모조품 교체 사실 최초 발견" }
+    ],
+    scene: {
+      rooms: [
+        { x: 18, y: 18, w: 170, h: 75, label: "특별 전시관 진열장", color: "#a855f7", unlockPhase: 0 },
+        { x: 212, y: 18, w: 170, h: 75, label: "이사장실 밀반출 금고", color: "#fbbf24", unlockPhase: 0 },
+        { x: 18, y: 108, w: 364, h: 74, label: "윤서아 개인 도자기 공방 [2차 개방]", color: "#38bdf8", unlockPhase: 1 }
+      ],
+      hotspots: [
+        {
+          id: "hs2_1", num: 1, x: 100, y: 56, unlockPhase: 0,
+          title: "진열장 모조품 청자 굽바닥",
+          detail: "모조품 바닥에 특수 도료 흔적이 남아 있다.",
+          evId: "ev2_uv"
+        },
+        {
+          id: "hs2_2", num: 2, x: 295, y: 56, unlockPhase: 0,
+          title: "해외 비밀 경매 위탁 계약서",
+          detail: "이사장이 진품 청자를 해외 암시장에 넘기려 작성한 밀반출 계약서.",
+          evId: "ev2_contract"
+        },
+        {
+          id: "hs2_3", num: 3, x: 200, y: 145, unlockPhase: 1,
+          title: "[2차 개방] 배수구 회수 마스터키 & 출입 로그",
+          detail: "00:50 원본 마스터키 개폐 로그 및 01:05 후문 배수구에서 회수된 열쇠.",
+          evId: "ev2_keylog"
+        }
+      ]
+    },
+    evidences: [
+      {
+        id: "ev2_uv", code: "EV-01",
+        name: "모조품 청자 바닥 시료",
+        desc: "[미감식] 모조품 바닥에 묻은 특수 표식.",
+        analyzed: false, requiredTool: "uv",
+        analyzedName: "UV 형광 개인 공방 낙관 감정서",
+        analyzedDesc: "윤서아 개인 공방에서만 사용하는 특수 UV 형광 인장이 모조품 바닥에서 검출되었다."
+      },
+      {
+        id: "ev2_contract", code: "EV-02",
+        name: "국보 해외 밀반출 위탁 계약서",
+        desc: "미술관 이사장이 진품 청자를 해외 컬렉터에게 팔아넘기려 한 밀약 문서.",
+        analyzed: true
+      },
+      {
+        id: "ev2_keylog", code: "EV-03",
+        name: "00:50 원본 키 개폐 및 배수구 회수 기록",
+        desc: "분실했다던 마스터키가 00:50 진열장을 열고 01:05 후문 배수구에 버려진 결정적 알리바이 붕괴 증거.",
+        analyzed: true
+      },
+      {
+        id: "ev2_witness", code: "EV-W2",
+        name: "[교차진술] 야간 기사 최민재 목격 진술",
+        desc: "01:05 후문 배수구 앞에서 윤서아를 목격했다는 교차 진술.",
+        analyzed: true
+      }
+    ],
+    mindmapSolution: {
+      motive: "ev2_contract",
+      means: "ev2_uv",
+      opportunity: "ev2_keylog"
+    },
+    testimonyPhases: [
+      {
+        title: "1차 심문: 모조품 출처 부인",
+        statements: [
+          {
+            id: "st2_1",
+            text: "그 조잡한 모조품 도자기는 제가 만든 물건이 아닙니다!",
+            keywords: ["UV", "형광", "낙관", "공방", "모조품", "바닥"],
+            pressReply: "감정사가 왜 자기 박물관 유물을 가짜로 만듭니까?",
+            contradictsWith: "ev2_uv",
+            breakReply: "모조품 바닥에서 제 개인 공방 UV 형광 낙관이 나왔다고요...?!"
+          }
+        ]
+      },
+      {
+        title: "2차 심문: 열쇠 분실 알리바이 돌파",
+        statements: [
+          {
+            id: "st2_2",
+            text: "설령 제 공방 작품이라 해도 전 00시 50분엔 집에 있었습니다! 열쇠는 잃어버렸다고요!",
+            keywords: ["00:50", "배수구", "마스터키", "후문", "밀반출", "계약서"],
+            pressReply: "제가 새벽에 미술관에 들어갔다는 증거가 어디 있습니까?",
+            contradictsWith: "ev2_keylog",
+            breakReply: "00시 50분 개폐 로그와 배수구 열쇠까지... 국보가 해외로 팔려가는 걸 막고 싶었을 뿐입니다..."
+          }
+        ]
+      }
+    ],
+    novelChapters: [
+      {
+        tag: "CHAPTER I // 비취색의 침묵",
+        loc: "2026.11.25 00:50 · 청담 고미술관",
+        heading: "제1장. 사라진 국보와 가짜의 눈물",
+        body: "어둠이 내린 전시관 유리벽 너머, 천 년의 세월을 견딘 고려청자 대신 갓 구워낸 모조품이 자리하고 있었다.\n\n수석 감정사 윤서아는 열쇠를 잃어버렸다며 고개를 숙였지만, 모조품 굽바닥에 새겨진 보이지 않는 형광 낙관은 그녀의 손길을 증언하고 있었다.",
+        quote: "“훔친 것이 아닙니다. 빼앗기기 전에 먼저 숨겼을 뿐입니다.”"
+      },
+      {
+        tag: "CHAPTER II // 빼앗길 뻔한 유산",
+        loc: "심문실 404 · 진실의 기록",
+        heading: "제2장. 조부가 목숨 걸고 지킨 문화재",
+        body: "이사장실 금고에서 발견된 밀반출 계약서는 모든 퍼즐을 맞추었다. 일제강점기 할아버지가 목숨을 걸고 지켜낸 청자가 다시 해외 암시장으로 팔려나갈 위기에 처하자, 손녀인 윤서아는 스스로 도둑이 되기를 자처했던 것이다."
+      }
+    ],
+    newspaper: {
+      date: "2026.11.26",
+      kicker: "CASE SOLVED // 문화재 수호",
+      headline: "청담 미술관 국보 바꿔치기 전말 밝혀져… 이사장 밀반출 음모 적발",
+      body: "수석 감정사 윤서아의 모조품 교체 트릭 이면에 재벌 이사장의 국보 해외 밀반출 음모가 숨어 있었던 것으로 드러났다."
+    }
+  },
+
+  {
+    num: 3,
+    isTutorial: false,
+    difficulty: "★★★☆☆",
+    category: "MARITIME MYSTERY // 부산 영도 해상",
+    title: "북극성호 선상 실종 미스터리",
+    subtitle: "원양어선 북극성호 조타실 및 선미 갑판 도면",
+    summary: "심야 항해 중 기관장이 바다에 빠져 실종되었다. 선장 강태오는 거친 돌풍에 실족했다고 주장한다.",
+    hiddenTruth: "기관장이 선장의 60억 불법 어획물 밀수 장부를 해경에 고발하려 하자, 강태오는 수면제를 탄 커피를 먹인 뒤 파도 없는 바다에 밀어 넣었다.",
+    epilogueA: "강태오는 살인 혐의로 무기징역을 구형받았고, 실종되었던 기관장은 인근 어선에 극적으로 구조되어 법정에 섰다.",
+    epilogueB: "당신은 강태오의 밀수 자금 60억 은닉 계좌와 해상 밀수 루트를 장악한 'OMEGA'의 암호 키를 인수했다.",
+    suspect: {
+      name: "강태오 (49세)",
+      role: "북극성호 선장",
+      themeColor: "#0ea5e9",
+      coatColor: "#0f2942",
+      hairColor: "#1e293b",
+      hasGlasses: false,
+      voicePitch: 0.85,
+      voiceRate: 0.95,
+      openingLine: "15년 함께 배를 탄 동료를 잃었습니다. 밤바다엔 예보에 없는 돌풍이 불어 구명환을 던졌지만 소용없었습니다.",
+      finalConfession: "구명환 염분 0%에 파고 0.3m 기상 기록까지... 60억 밀수 장부가 들킬까 두려워 동료를 밀었습니다.",
+      winSummary: "북극성호 선장 강태오의 위장 조난 연극을 완벽히 파훼했습니다!",
+      loseSummary: "강태오의 해상 사고 변명을 깨뜨리지 못했습니다."
+    },
+    witness: {
+      name: "정해수 (31세)",
+      role: "북극성호 1등 항해사",
+      themeColor: "#f59e0b",
+      coatColor: "#292524",
+      hairColor: "#0f172a",
+      hasGlasses: false,
+      voicePitch: 1.05,
+      voiceRate: 1.05,
+      testimony: "선장님 말씀대로 파도가 거칠었고 선장님이 구명환을 던지는 걸 봤습니다.",
+      contradictionHint: "사실 그날 바다는 호수처럼 잔잔했고, 선장님이 보온병을 몰래 숨기는 걸 봤습니다.",
+      keywords: ["잔잔", "파도", "보온병", "수면제", "거짓"],
+      unlockEvId: "ev3_witness",
+      breakReply: "선장님이 가족을 협박해서 거짓말했습니다! 그날 파도는 전혀 없었고 선장님이 보온병을 숨겼습니다!"
+    },
+    timeline: [
+      { time: "21:30", event: "부산 영도항 출항" },
+      { time: "22:40", event: "해상 GPS 정지 (파고 0.3m 잔잔한 상태)" },
+      { time: "23:10", event: "강태오 선장 단독 조난 신고" }
+    ],
+    scene: {
+      rooms: [
+        { x: 18, y: 18, w: 170, h: 75, label: "기관장 개인 선실", color: "#f59e0b", unlockPhase: 0 },
+        { x: 212, y: 18, w: 170, h: 75, label: "선미 갑판 구명환 거치대", color: "#38bdf8", unlockPhase: 0 },
+        { x: 18, y: 108, w: 364, h: 74, label: "조타실 기상 블랙박스 [2차 개방]", color: "#ef4444", unlockPhase: 1 }
+      ],
+      hotspots: [
+        {
+          id: "hs3_1", num: 1, x: 100, y: 56, unlockPhase: 0,
+          title: "기관장 방수 가방 속 USB",
+          detail: "강태오 선장의 60억 불법 밀수 내역과 해경 고발장 초안이 담긴 장부.",
+          evId: "ev3_ledger"
+        },
+        {
+          id: "hs3_2", num: 2, x: 295, y: 56, unlockPhase: 0,
+          title: "바다에 던졌다 건졌다는 구명환",
+          detail: "표면의 바닷물 염분 반응 감식이 필요한 구명환.",
+          evId: "ev3_tube"
+        },
+        {
+          id: "hs3_3", num: 3, x: 200, y: 145, unlockPhase: 1,
+          title: "[2차 개방] 조타실 해상 기상 블랙박스",
+          detail: "사고 시각 해당 해역의 파고는 0.3m로 돌풍이 전혀 없었음을 입증하는 항해 기록.",
+          evId: "ev3_weather"
+        }
+      ]
+    },
+    evidences: [
+      {
+        id: "ev3_ledger", code: "EV-01",
+        name: "60억 불법 밀수 비밀 장부",
+        desc: "기관장이 해경에 넘기려 했던 강태오 선장의 60억 원대 밀수 장부.",
+        analyzed: true
+      },
+      {
+        id: "ev3_tube", code: "EV-02",
+        name: "회수된 선미 구명환 시료",
+        desc: "[미감식] 구조용으로 바다에 던졌다는 구명환 표면 면봉.",
+        analyzed: false, requiredTool: "chem",
+        analyzedName: "구명환 염분 반응 0% 음성 감정서",
+        analyzedDesc: "바닷물 염분이 전혀 검출되지 않았다. 구명환은 바다에 던져진 적이 없다."
+      },
+      {
+        id: "ev3_weather", code: "EV-03",
+        name: "파고 0.3m 해상 기상 관측 기록",
+        desc: "돌풍으로 실족했다는 알리바이를 붕괴시키는 22:40 기상 관측 블랙박스.",
+        analyzed: true
+      },
+      {
+        id: "ev3_witness", code: "EV-W3",
+        name: "[교차진술] 1등 항해사 정해수 양심선언",
+        desc: "선장의 협박으로 거짓 진술을 했으며 당시 파도가 전혀 없었다는 증언.",
+        analyzed: true
+      }
+    ],
+    mindmapSolution: {
+      motive: "ev3_ledger",
+      means: "ev3_tube",
+      opportunity: "ev3_weather"
+    },
+    testimonyPhases: [
+      {
+        title: "1차 심문: 구명환 구조 연기 추궁",
+        statements: [
+          {
+            id: "st3_1",
+            text: "동료를 살리려고 즉시 구명환을 바다에 던졌습니다! 저 구명환이 증거입니다!",
+            keywords: ["구명환", "염분", "바닷물", "던진", "0%"],
+            pressReply: "밤바다에 던졌다 건져 올린 구명환이 틀림없습니다!",
+            contradictsWith: "ev3_tube",
+            breakReply: "구명환에서 바닷물 염분이 0% 검출됐다고요?! 그, 그건 빗물에 씻겨서..."
+          }
+        ]
+      },
+      {
+        title: "2차 심문: 돌풍 실족 알리바이 돌파",
+        statements: [
+          {
+            id: "st3_2",
+            text: "갑작스러운 돌풍과 높은 파도에 실족한 사고입니다! 제가 동료를 해칠 이유도 없습니다!",
+            keywords: ["파고", "0.3", "돌풍", "기상", "밀수", "60억", "장부"],
+            pressReply: "해상 날씨는 육지 기상대와 다릅니다!",
+            contradictsWith: "ev3_weather",
+            breakReply: "파고 0.3m 기상 기록과 60억 밀수 장부까지... 제가 모든 죄를 인정하겠습니다..."
+          }
+        ]
+      }
+    ],
+    novelChapters: [
+      {
+        tag: "CHAPTER I // 검은 수평선",
+        loc: "2026.11.24 22:40 · 영도 남방 해상",
+        heading: "제1장. 파도 없는 밤의 추락",
+        body: "그날 밤 남해의 바다는 거울처럼 고요했다. 파고 0.3미터의 잔잔한 물결 위로 울려 퍼진 메이데이 무전은 처음부터 치밀하게 계산된 연극이었다.",
+        quote: "“바다는 거짓말을 하지 않는다. 마르지 않은 구명환만이 침묵을 깰 뿐이다.”"
+      },
+      {
+        tag: "CHAPTER II // 탐욕의 대가",
+        loc: "심문실 404 · 종결 기록",
+        heading: "제2장. 60억 장부가 삼킨 15년 우정",
+        body: "15년을 함께한 동료의 양심을 돈으로 살 수 없었던 선장은 결국 비정한 선택을 내렸지만, 바닷물 한 방울 묻지 않은 구명환이 그의 배신을 만천하에 드러냈다."
+      }
+    ],
+    newspaper: {
+      date: "2026.11.26",
+      kicker: "CASE SOLVED // 해상 살인 검거",
+      headline: "북극성호 선장 강태오, 60억 밀수 은폐하려 동료 해상 유기 자백",
+      body: "염분이 전혀 검출되지 않은 구명환과 기상 블랙박스 분석으로 선상 실종 사건이 계획 범죄였음이 밝혀졌다."
+    }
+  },
+
+  {
+    num: 4,
+    isTutorial: false,
+    difficulty: "★★★☆☆",
+    category: "CASINO FRAUD // 강남 VVIP 라운지",
+    title: "강남 VVIP 카지노 칩 위조 사건",
+    subtitle: "프라이빗 카지노 VIP 금고실 및 딜러 라커룸 도면",
+    summary: "하룻밤 사이 50억 원 상당의 위조 VVIP 칩이 환전되었다. 수석 딜러 백지훈은 외부 조직의 소행이라고 주장한다.",
+    hiddenTruth: "사채 조직에 납치된 여동생의 몸값 50억 원을 마련하기 위해, 백지훈은 금고의 UV 보안 도료를 빼내 위조 칩을 만들고 카지노의 검은 돈을 털었다.",
+    epilogueA: "백지훈은 구속되었지만 수사팀의 공조로 납치된 여동생은 무사히 구출되었고 불법 카지노 역시 폐쇄되었다.",
+    epilogueB: "당신은 백지훈의 여동생을 구출해 주는 조건으로 50억 환전 자금의 절반과 'OMEGA'의 VIP 고객 장부를 손에 넣었다.",
+    suspect: {
+      name: "백지훈 (37세)",
+      role: "카지노 수석 딜러",
+      themeColor: "#10b981",
+      coatColor: "#064e3b",
+      hairColor: "#0f172a",
+      hasGlasses: true,
+      voicePitch: 1.0,
+      voiceRate: 1.04,
+      openingLine: "전 02시에 교대하고 휴게실에서 잤습니다. 외부 위조범들이 정교한 가짜 칩을 들고 온 겁니다.",
+      finalConfession: "턱시도 소매의 UV 보안 도료와 02:15 금고 출입 로그까지... 동생을 살리려면 그 돈이 필요했습니다.",
+      winSummary: "위조 칩 사건의 진상을 규명하고 납치된 여동생 구출 단서까지 확보했습니다!",
+      loseSummary: "백지훈의 알리바이를 무너뜨리지 못했습니다."
+    },
+    witness: {
+      name: "한유리 (29세)",
+      role: "환전소 정산 매니저",
+      themeColor: "#ec4899",
+      coatColor: "#4c0519",
+      hairColor: "#1e1b4b",
+      hasGlasses: false,
+      voicePitch: 1.22,
+      voiceRate: 1.06,
+      testimony: "03시 05분 환전은 정상 VIP 승인 절차를 거쳐 처리되었습니다.",
+      contradictionHint: "사실 백지훈 딜러님이 사정해서 신원 확인 없이 특별 승인 코드를 입력해 주었습니다.",
+      keywords: ["승인", "코드", "특별", "사정", "03:05"],
+      unlockEvId: "ev4_witness",
+      breakReply: "백지훈 선배가 급한 사정이 있다며 부탁해서 제가 대리 승인 코드를 눌러줬습니다!"
+    },
+    timeline: [
+      { time: "02:00", event: "백지훈 야간 딜러 교대 완료" },
+      { time: "02:15", event: "지하 1층 칩 금고실 백지훈 카드로 개방" },
+      { time: "03:05", event: "50억 원 상당 칩 현금 환전 완료" }
+    ],
+    scene: {
+      rooms: [
+        { x: 18, y: 18, w: 170, h: 75, label: "지하 1F 칩 금고실", color: "#10b981", unlockPhase: 0 },
+        { x: 212, y: 18, w: 170, h: 75, label: "딜러 전용 라커룸", color: "#f87171", unlockPhase: 0 },
+        { x: 18, y: 108, w: 364, h: 74, label: "사채 조직 협박 메시지 서버 [2차 개방]", color: "#fbbf24", unlockPhase: 1 }
+      ],
+      hotspots: [
+        {
+          id: "hs4_1", num: 1, x: 100, y: 56, unlockPhase: 0,
+          title: "02:15 칩 금고실 출입 리더",
+          detail: "휴게실에서 자고 있었다던 02:15에 백지훈의 카드와 홍채로 금고가 열린 기록.",
+          evId: "ev4_vault"
+        },
+        {
+          id: "hs4_2", num: 2, x: 295, y: 56, unlockPhase: 0,
+          title: "라커 속 턱시도 소매 시료",
+          detail: "백지훈의 턱시도 소매 끝에 묻은 특수 형광 물질 감식 필요.",
+          evId: "ev4_uv"
+        },
+        {
+          id: "hs4_3", num: 3, x: 200, y: 145, unlockPhase: 1,
+          title: "[2차 개방] 여동생 납치 몸값 요구 녹취",
+          detail: "새벽 4시까지 50억 원을 가져오지 않으면 여동생을 해치겠다는 사채 조직의 협박 메시지.",
+          evId: "ev4_ransom"
+        }
+      ]
+    },
+    evidences: [
+      {
+        id: "ev4_vault", code: "EV-01",
+        name: "02:15 칩 금고실 홍채·카드 출입 로그",
+        desc: "02:15 금고실에 직접 출입해 진품 칩을 빼내고 위조 칩을 투입한 기록.",
+        analyzed: true
+      },
+      {
+        id: "ev4_uv", code: "EV-02",
+        name: "턱시도 소매 끝단 채취 시료",
+        desc: "[미감식] 딜러 라커에서 확보한 턱시도 소매 시료.",
+        analyzed: false, requiredTool: "uv",
+        analyzedName: "금고 전용 UV 보안 도료 일치 감정서",
+        analyzedDesc: "위조 칩 표면에 칠해진 금고 내부 전용 UV 보안 도료가 백지훈의 턱시도 소매에서도 동일하게 검출되었다."
+      },
+      {
+        id: "ev4_ransom", code: "EV-03",
+        name: "여동생 납치 몸값 50억 협박 녹취",
+        desc: "범행 직전 사채 조직이 여동생을 납치해 50억 원을 요구한 범행 동기 입증 파일.",
+        analyzed: true
+      },
+      {
+        id: "ev4_witness", code: "EV-W4",
+        name: "[교차진술] 환전 매니저 한유리 진술서",
+        desc: "백지훈의 부탁으로 신원 확인 없이 환전을 승인해 주었다는 교차 증언.",
+        analyzed: true
+      }
+    ],
+    mindmapSolution: {
+      motive: "ev4_ransom",
+      means: "ev4_uv",
+      opportunity: "ev4_vault"
+    },
+    testimonyPhases: [
+      {
+        title: "1차 심문: 금고 출입 부인",
+        statements: [
+          {
+            id: "st4_1",
+            text: "전 02시에 교대하자마자 휴게실에서 잤습니다. 금고실엔 들어간 적이 없습니다!",
+            keywords: ["02:15", "금고", "출입", "홍채", "카드"],
+            pressReply: "제 카드를 누군가 도용했을 겁니다!",
+            contradictsWith: "ev4_vault",
+            breakReply: "02시 15분에 제 홍채와 카드가 동시에 인증됐다니... 그건..."
+          }
+        ]
+      },
+      {
+        title: "2차 심문: 위조 칩 제작 및 동기 돌파",
+        statements: [
+          {
+            id: "st4_2",
+            text: "금고에 잠깐 들어갔다 해도 제가 그 정교한 위조 칩을 만들었다는 증거는 어디 있습니까!",
+            keywords: ["UV", "도료", "턱시도", "소매", "동생", "납치", "50억"],
+            pressReply: "딜러가 어떻게 위조 칩을 만듭니까?",
+            contradictsWith: "ev4_uv",
+            breakReply: "턱시도 소매의 UV 보안 도료와 여동생 납치 녹취까지... 제발 동생부터 구해 주십시오..."
+          }
+        ]
+      }
+    ],
+    novelChapters: [
+      {
+        tag: "CHAPTER I // 붉은 펠트 위의 도박",
+        loc: "2026.11.24 02:15 · 강남 VVIP 라운지",
+        heading: "제1장. 목숨을 건 마지막 베팅",
+        body: "화려한 샹들리에 아래 오가는 수십억 원의 칩들. 하지만 수석 딜러 백지훈에게 그 밤의 게임은 돈이 아닌 유일한 가족의 목숨이 걸린 사투였다.",
+        quote: "“가짜 칩으로 진짜 목숨을 살릴 수 있다면, 몇 번이고 악마와 거래하겠습니다.”"
+      },
+      {
+        tag: "CHAPTER II // 형제의 사투",
+        loc: "심문실 404 · 진실의 기록",
+        heading: "제2장. 50억 몸값과 UV 도료의 흔적",
+        body: "사채 조직에 납치된 여동생을 구하기 위해 카지노의 검은 돈을 털었던 백지훈은 수사팀의 신속한 공조로 여동생이 무사하다는 소식을 듣자 비로소 안도의 눈물을 흘렸다."
+      }
+    ],
+    newspaper: {
+      date: "2026.11.26",
+      kicker: "CASE SOLVED // 납치 인질 구출",
+      headline: "강남 카지노 50억 위조 사건 전말… 여동생 구하려던 딜러의 사투",
+      body: "수사팀은 위조 칩 사건을 해결함과 동시에 배후 사채 조직의 아지트를 급습해 납치된 피해자를 무사히 구출했다."
+    }
+  },
+
+  {
+    num: 5,
+    isTutorial: false,
+    difficulty: "★★★★☆",
+    category: "MEDICAL REVENGE // 한국대학병원",
+    title: "한국대학병원 응급실 0.3mg의 비밀",
+    subtitle: "한국대학병원 VIP 병동 및 약품 보관실 도면",
+    summary: "재벌가 후계자가 수액 쇼크로 중태에 빠졌다. 전문의 서현우는 간호사의 투약 실수라고 주장한다.",
+    hiddenTruth: "1년 전 재벌 후계자의 음주운전 뺑소니와 병원장의 수술실 양보 지시로 제때 수술받지 못해 숨진 어린 딸의 복수를 위해 서현우가 고농도 염화칼륨을 주입했다.",
+    epilogueA: "서현우는 살인미수 혐의로 구속되었지만, 재판 과정에서 1년 전 병원과 재벌가의 사망 은폐 커넥션이 전면 재수사에 들어갔다.",
+    epilogueB: "당신은 서현우의 진술서를 봉인하는 조건으로, 1년 전 사건 은폐를 설계한 'OMEGA'의 병원장 직통 핫라인을 확보했다.",
+    suspect: {
+      name: "서현우 (34세)",
+      role: "응급의학과 전문의",
+      themeColor: "#ef4444",
+      coatColor: "#3f1414",
+      hairColor: "#0f172a",
+      hasGlasses: true,
+      voicePitch: 0.94,
+      voiceRate: 0.98,
+      openingLine: "야간 당직 간호사가 앰플을 착각해 수액에 섞은 겁니다. 생명을 살리는 의사에게 살인미수라니 모욕적입니다.",
+      finalConfession: "염화칼륨 보관함 지문과 제 딸의 사망 기록까지... 법이 심판하지 않은 괴물을 제가 심판하려 했습니다.",
+      winSummary: "한국대학병원 0.3mg 쇼크 사건의 비극적 전말을 모두 밝혀냈습니다!",
+      loseSummary: "서현우의 완벽한 알리바이 앞에서 영장이 기각되었습니다."
+    },
+    witness: {
+      name: "이수빈 (28세)",
+      role: "VIP 병동 담당 간호사",
+      themeColor: "#22d3ee",
+      coatColor: "#164e63",
+      hairColor: "#1e293b",
+      hasGlasses: false,
+      voicePitch: 1.2,
+      voiceRate: 1.05,
+      testimony: "죄송합니다, 제가 피곤해서 수액 앰플을 잘못 확인한 것 같습니다...",
+      contradictionHint: "사실 02시 10분부터 9층 중환자실 호출로 병동을 비웠고, 서현우 선생님께 책임을 떠안으라는 압박을 받았습니다.",
+      keywords: ["9층", "중환자실", "호출", "압박", "02:10", "비웠"],
+      unlockEvId: "ev5_witness",
+      breakReply: "사실 전 02시 10분부터 9층 중환자실에 있었습니다! 병원이 제 면허를 거론하며 대신 뒤집어쓰라고 했습니다!"
+    },
+    timeline: [
+      { time: "02:10", event: "담당 간호사, 9층 중환자실 응급 호출로 12층 병동 이탈" },
+      { time: "02:18", event: "서현우 지문으로 고농도 염화칼륨(KCl) 보관함 개방" },
+      { time: "02:24", event: "VIP 병실 수액 투약 후 환자 심정지 경보 발령" }
+    ],
+    scene: {
+      rooms: [
+        { x: 18, y: 18, w: 170, h: 75, label: "응급 약품 보관실", color: "#38bdf8", unlockPhase: 0 },
+        { x: 212, y: 18, w: 170, h: 75, label: "가운 수거함 & 멸균실", color: "#f87171", unlockPhase: 0 },
+        { x: 18, y: 108, w: 364, h: 74, label: "1년 전 응급실 사망 은폐 기록실 [2차 개방]", color: "#fbbf24", unlockPhase: 1 }
+      ],
+      hotspots: [
+        {
+          id: "hs5_1", num: 1, x: 100, y: 56, unlockPhase: 0,
+          title: "고농도 KCl 보관함 지문 리더",
+          detail: "02:18 서현우 본인의 지문으로 열리고 치사량 앰플 1개가 사라진 전자 기록.",
+          evId: "ev5_box"
+        },
+        {
+          id: "hs5_2", num: 2, x: 295, y: 56, unlockPhase: 0,
+          title: "가운 주머니 미세 유리 파편",
+          detail: "서현우 가운 주머니에서 나온 깨진 앰플 조각 현미경 분석 필요.",
+          evId: "ev5_glass"
+        },
+        {
+          id: "hs5_3", num: 3, x: 200, y: 145, unlockPhase: 1,
+          title: "[2차 개방] 1년 전 딸 사망 사건 은폐 의무기록",
+          detail: "피해자인 재벌 후계자의 수술실 새치기로 서현우의 딸이 사망했던 1년 전 원본 차트.",
+          evId: "ev5_motive"
+        }
+      ]
+    },
+    evidences: [
+      {
+        id: "ev5_box", code: "EV-01",
+        name: "02:18 염화칼륨 보관함 지문 로그",
+        desc: "간호사가 9층에 있던 02:18에 서현우 지문으로 극약 보관함이 열린 기록.",
+        analyzed: true
+      },
+      {
+        id: "ev5_glass", code: "EV-02",
+        name: "가운 주머니 유리 파편 시료",
+        desc: "[미감식] 서현우 가운 안주머니에서 채취한 앰플 조각.",
+        analyzed: false, requiredTool: "micro",
+        analyzedName: "KCl 앰플 파단면 100% 일치 감정서",
+        analyzedDesc: "현미경 판독 결과, 보관함에서 사라진 고농도 염화칼륨 앰플과 파단면이 정확히 일치한다."
+      },
+      {
+        id: "ev5_motive", code: "EV-03",
+        name: "1년 전 어린 딸 수술 지연 사망 차트",
+        desc: "재벌 후계자의 VIP 특혜 수술 때문에 서현우의 딸이 응급실에서 숨진 비극적 동기 문서.",
+        analyzed: true
+      },
+      {
+        id: "ev5_witness", code: "EV-W5",
+        name: "[교차진술] 간호사 이수빈 9층 체류 입증서",
+        desc: "사건 당시 9층에 있었으며 병원 측 강요로 거짓 자백하려 했다는 진술.",
+        analyzed: true
+      }
+    ],
+    mindmapSolution: {
+      motive: "ev5_motive",
+      means: "ev5_glass",
+      opportunity: "ev5_box"
+    },
+    testimonyPhases: [
+      {
+        title: "1차 심문: 간호사 과실 전가 추궁",
+        statements: [
+          {
+            id: "st5_1",
+            text: "담당 간호사가 수액 제제를 착각해 잘못 연결한 의료 사고입니다!",
+            keywords: ["02:18", "보관함", "지문", "간호사", "9층", "염화칼륨"],
+            pressReply: "간호사 본인도 실수를 인정하지 않았습니까!",
+            contradictsWith: "ev5_box",
+            breakReply: "02시 18분에 제 지문으로 염화칼륨 보관함이 열렸다는 기록이 남았다니..."
+          }
+        ]
+      },
+      {
+        title: "2차 심문: 앰플 파편 및 복수 동기 돌파",
+        statements: [
+          {
+            id: "st5_2",
+            text: "의사에게 살인미수 누명을 씌우려면 제가 직접 앰플을 깼다는 물증과 동기를 가져오십시오!",
+            keywords: ["유리", "파편", "현미경", "딸", "1년", "사망", "차트"],
+            pressReply: "제가 그 환자를 해칠 동기가 전혀 없습니다!",
+            contradictsWith: "ev5_glass",
+            breakReply: "앰플 파단면과 제 딸의 1년 전 사망 차트까지... 법이 외면한 죄값을 제가 직접 물으려 했습니다..."
+          }
+        ]
+      }
+    ],
+    novelChapters: [
+      {
+        tag: "CHAPTER I // 차가운 수액",
+        loc: "2026.11.25 02:24 · 한국대학병원 VIP 병동",
+        heading: "제1장. 0.3mg의 침묵",
+        body: "생명을 살리기 위해 잡았던 메스가 복수의 칼날로 변한 밤. 응급의학과 전문의 서현우는 아무도 없는 복도 끝에서 1년 전 그날의 비명을 떠올렸다.",
+        quote: "“돈으로 산 수술실 문 앞에서 제 딸의 심장이 멈췄을 때, 제 안의 의사도 함께 죽었습니다.”"
+      },
+      {
+        tag: "CHAPTER II // 아버지의 복수",
+        loc: "심문실 404 · 비극의 기록",
+        heading: "제2장. 법이 외면한 자들의 비극",
+        body: "가운 주머니 속 작은 유리 파편과 1년 전 조작된 사망 차트는 한 아버지의 피눈물 나는 복수극을 드러내며 심문실 전체를 무거운 침묵에 잠기게 했다."
+      }
+    ],
+    newspaper: {
+      date: "2026.11.27",
+      kicker: "SHOCKING TRUTH // 의료계 파문",
+      headline: "대학병원 VIP 쇼크 사건의 비극적 전말… 1년 전 사망 은폐 특혜 재수사",
+      body: "전문의 서현우의 범행 이면에 1년 전 재벌가 특혜 수술로 어린 딸을 잃은 비극이 숨어 있었던 것으로 밝혀져 사회에 큰 충격을 주고 있다."
+    }
+  },
+
+  {
+    num: 10,
+    isTutorial: false,
+    difficulty: "★★★★★ [FINAL BOSS]",
+    category: "FINAL ARCHIVE // 설계자 'OMEGA'",
+    title: "설계자 'OMEGA'의 최후 심문실",
+    subtitle: "연쇄 사건 배후 설계자 'OMEGA' 특별 심문실",
+    summary: "앞선 사건들의 이면에 돈을 대고 완전범죄를 설계해 준 천재 프로파일러 신태윤(OMEGA)이 스스로 경찰청에 걸어 들어왔다.",
+    hiddenTruth: "10년 전 권력형 범죄로 가족을 잃고도 법정에서 가해자들이 무죄로 풀려나자, 신태윤은 법이 심판하지 못하는 악인들을 단죄하기 위해 'OMEGA'가 되었다.",
+    epilogueA: "신태윤은 법의 심판대에 섰고, 그가 남긴 방대한 권력형 비리 아카이브가 공개되며 대한민국 사법 역사의 거대한 정화가 시작되었다.",
+    epilogueB: "당신은 신태윤의 자백 조서를 파쇄하고 'OMEGA'의 마스터 서버 권한을 이어받아, 법 너머에서 세상을 심판하는 새로운 설계자가 되었다.",
+    suspect: {
+      name: "신태윤 / OMEGA (39세)",
+      role: "범죄 심리 프로파일러 · 설계자",
+      themeColor: "#f43f5e",
+      coatColor: "#1f0912",
+      hairColor: "#090d16",
+      hasGlasses: true,
+      voicePitch: 0.88,
+      voiceRate: 0.96,
+      openingLine: "반갑습니다, 수사관님. 당신이 어떤 정의를 선택해 왔는지 다 지켜봤습니다. 자, 마지막 진실을 맞춰보시죠.",
+      finalConfession: "안경테 마스터키와 10년 전 판결문까지... 당신이라면 제가 남긴 이 아카이브의 무게를 감당할 수 있겠군요.",
+      winSummary: "설계자 'OMEGA'의 정체와 10년의 진실을 모두 밝혀내며 심문실 404의 대서사를 완결했습니다!",
+      loseSummary: "설계자 'OMEGA'의 최후 논리를 돌파하지 못했습니다."
+    },
+    witness: {
+      name: "강지훈 (46세)",
+      role: "특별수사본부 감찰관",
+      themeColor: "#fbbf24",
+      coatColor: "#1e293b",
+      hairColor: "#0f172a",
+      hasGlasses: false,
+      voicePitch: 0.96,
+      voiceRate: 1.0,
+      testimony: "신태윤은 23시 50분 자진 출두 직전 모든 다크웹 서버를 폭파했습니다. 물증이 없습니다.",
+      contradictionHint: "사실 폭파 0.2초 전 낚아챈 11번째 기획서 캐시 파일이 분석실에 보관되어 있습니다.",
+      keywords: ["0.2초", "캐시", "기획서", "분석실", "11번째"],
+      unlockEvId: "ev10_witness",
+      breakReply: "사실 서버 폭파 0.2초 전에 확보한 11번째 기획서 캐시 파일이 분석실 서버에 남아 있습니다!"
+    },
+    timeline: [
+      { time: "23:40", event: "다크웹 'OMEGA' 서버 자폭 패킷 발송" },
+      { time: "23:50", event: "신태윤, 특별수사본부 로비 자진 출두" },
+      { time: "00:00", event: "심문실 404 최종 심문 개시" }
+    ],
+    scene: {
+      rooms: [
+        { x: 18, y: 18, w: 170, h: 75, label: "압수 소지품 정밀 분석대", color: "#f43f5e", unlockPhase: 0 },
+        { x: 212, y: 18, w: 170, h: 75, label: "10년 전 미제사건 기록보관소", color: "#fbbf24", unlockPhase: 0 },
+        { x: 18, y: 108, w: 364, h: 74, label: "다크웹 0.2초 잔여 캐시 서버 [2차 개방]", color: "#38bdf8", unlockPhase: 1 }
+      ],
+      hotspots: [
+        {
+          id: "hs10_1", num: 1, x: 100, y: 56, unlockPhase: 0,
+          title: "신태윤의 티타늄 안경테",
+          detail: "안경테 안쪽 나사에 새겨진 극미세 각인 현미경 판독 필요.",
+          evId: "ev10_glasses"
+        },
+        {
+          id: "hs10_2", num: 2, x: 295, y: 56, unlockPhase: 0,
+          title: "10년 전 가족 사망 사건 무죄 판결문",
+          detail: "신태윤의 가족을 숨지게 한 권력자들이 무죄로 풀려난 10년 전 판결 기록.",
+          evId: "ev10_motive"
+        },
+        {
+          id: "hs10_3", num: 3, x: 200, y: 145, unlockPhase: 1,
+          title: "[2차 개방] 다크웹 'OMEGA' 0.2초 잔여 패킷",
+          detail: "23:40 서버 폭파 직전 신태윤의 단말기 IP에서 발송된 마스터 폐기 패킷 로그.",
+          evId: "ev10_packet"
+        }
+      ]
+    },
+    evidences: [
+      {
+        id: "ev10_glasses", code: "EV-01",
+        name: "티타늄 안경테 나사 시료",
+        desc: "[미감식] 신태윤 안경테 안쪽의 극미세 레이저 각인.",
+        analyzed: false, requiredTool: "micro",
+        analyzedName: "다크웹 'OMEGA' 오프라인 마스터 시드키",
+        analyzedDesc: "초고배율 현미경 판독 결과, 다크웹 총책 OMEGA의 16자리 지갑 마스터 시드와 100% 일치한다."
+      },
+      {
+        id: "ev10_motive", code: "EV-02",
+        name: "10년 전 가족 참사 무죄 판결문",
+        desc: "법이 권력자들에게 면죄부를 주었던 날, 신태윤이 'OMEGA'가 되기로 결심한 비극적 동기.",
+        analyzed: true
+      },
+      {
+        id: "ev10_packet", code: "EV-03",
+        name: "23:40 OMEGA 서버 자폭 패킷 로그",
+        desc: "자수 10분 전 신태윤 본인의 생체 단말기에서 다크웹 서버 폐기 명령이 전송된 결정적 알리바이 붕괴 증거.",
+        analyzed: true
+      },
+      {
+        id: "ev10_witness", code: "EV-W10",
+        name: "[교차진술] 감찰관 강지훈 잔여 캐시 확인서",
+        desc: "서버 폭파 0.2초 전 11번째 기획서 패킷이 포착되었다는 교차 진술.",
+        analyzed: true
+      }
+    ],
+    mindmapSolution: {
+      motive: "ev10_motive",
+      means: "ev10_glasses",
+      opportunity: "ev10_packet"
+    },
+    testimonyPhases: [
+      {
+        title: "1차 심문: 물리적 연결고리 부인",
+        statements: [
+          {
+            id: "st10_1",
+            text: "제 몸 어디에도 다크웹 'OMEGA'와 연결된 물리적 키나 증거는 존재하지 않습니다.",
+            keywords: ["안경", "나사", "현미경", "시드", "마스터", "각인"],
+            pressReply: "프로파일러가 범죄자들의 심리를 연구한 게 죄입니까?",
+            contradictsWith: "ev10_glasses",
+            breakReply: "안경테 나사에 새긴 16자리 오프라인 마스터 시드키까지 찾아낼 줄이야..."
+          }
+        ]
+      },
+      {
+        title: "2차 심문: 서버 폐기 및 동기 돌파",
+        statements: [
+          {
+            id: "st10_2",
+            text: "좋습니다. 하지만 내가 23시 40분에 서버를 닫았다는 기록과 내가 왜 OMEGA가 되었는지는 결코 밝혀내지 못할 겁니다!",
+            keywords: ["23:40", "패킷", "자폭", "10년", "판결문", "가족"],
+            pressReply: "당신의 추리가 제 10년의 설계를 넘어설 수 있을까요?",
+            contradictsWith: "ev10_packet",
+            breakReply: "23시 40분 자폭 패킷과 10년 전 판결문까지... 완패입니다. 제가 바로 OMEGA입니다."
+          }
+        ]
+      }
+    ],
+    novelChapters: [
+      {
+        tag: "CHAPTER I // 심연의 설계자",
+        loc: "2026.11.26 00:00 · 심문실 404",
+        heading: "제1장. 스스로 걸어 들어온 그림자",
+        body: "폭우가 쏟아지던 자정, 천재 프로파일러 신태윤은 아무런 저항도 없이 수갑을 받아들였다. 그의 안경테 안쪽에 새겨진 0.1밀리미터의 각인은 지난 10년간 대한민국을 뒤흔든 모든 완전범죄의 시작점이었다.",
+        quote: "“법정이 닫힌 곳에서, 나는 또 다른 재판을 열었을 뿐입니다.”"
+      },
+      {
+        tag: "CHAPTER II // 심문실 404의 종장",
+        loc: "FINAL ARCHIVE · 영구 보존 기록",
+        heading: "제2장. 정의와 어둠의 경계선",
+        body: "10년 전 법에 버림받아 괴물이 된 남자와, 그를 마주한 수사관. 심문실 404의 붉은 녹화 램프가 꺼지는 순간, 모든 진실은 당신의 선택과 함께 역사의 한 페이지로 기록되었다."
+      }
+    ],
+    newspaper: {
+      date: "2026.11.28",
+      kicker: "GRAND FINALE // 섀도우 아카이브 완결",
+      headline: "전설의 설계자 'OMEGA' 정체 규명… 심문실 404 특별수사 막 내려",
+      body: "연쇄 미스터리 사건의 배후 설계자 'OMEGA'의 모든 전말이 밝혀지며 심문실 404의 기나긴 추리 여정이 대단원의 막을 내렸다."
+    }
+  }
+];
+
+const savedCampaign = (() => {
+  try {
+    return JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
+  } catch (_) {
+    return {};
+  }
+})();
+
+const game = {
+  stageNum: 1,
+  tab: "scene",
+  interrogationTarget: "suspect",
+  hp: 5,
+  maxHp: 5,
+  mistakes: 0,
+  solvedSpotIds: [],
+  collectedEvIds: [],
+  analyzedEvIds: [],
+  combinedEvIds: [],
+  unlockedIntelIds: [],
+  witnessBroken: false,
+  selectedSpotId: null,
+  seqBuffer: [],
+  csiTargetEvId: null,
+  slotA: null,
+  slotB: null,
+  mindmapSlots: { motive: null, means: null, opportunity: null },
+  phaseIdx: 0,
+  stmtIdx: 0,
+  selectedCourtEvId: null,
+  pressedStmtIds: [],
+  brokenStmtIds: [],
+  pressure: 0,
+  mood: "calm",
+  isOver: false,
+  isTyping: false,
+  typingTimer: null,
+  bpmSpike: 0,
+  audioOn: false,
+  volume: typeof savedCampaign.volume === "number" ? savedCampaign.volume : 0.8,
+  ttsOn: true,
+  bgmMode: "hub",
+  resetArmed: false,
+  geminiKey: localStorage.getItem("r404_gemini_key") || "",
+  aiHistory: [],
+  storyQueue: [],
+  storyIdx: 0,
+  storyCallback: null,
+  novelPages: [],
+  novelPageIdx: 0,
+  novelCloseCb: null,
+  tutorialCompleted: Boolean(savedCampaign.tutorialCompleted),
+  activeBoardNums: Array.isArray(savedCampaign.activeBoardNums) && savedCampaign.activeBoardNums.length > 0
+    ? savedCampaign.activeBoardNums
+    : [2, 3, 4, 5],
+  solvedNums: Array.isArray(savedCampaign.solvedNums) ? savedCampaign.solvedNums : [],
+  ranks: savedCampaign.ranks || {},
+  endings: savedCampaign.endings || {},
+  memos: savedCampaign.memos || {}
+};
+
+function saveCampaignState() {
+  try {
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      tutorialCompleted: game.tutorialCompleted,
+      activeBoardNums: game.activeBoardNums,
+      solvedNums: game.solvedNums,
+      ranks: game.ranks,
+      endings: game.endings,
+      memos: game.memos,
+      volume: game.volume
+    }));
+  } catch (_) {}
+}
+
+function getStage(num) {
+  return STAGE_DATA.find(s => s.num === num) || STAGE_DATA[0];
+}
+
+function getReputationInfo() {
+  const vals = Object.values(game.endings || {});
+  const countA = vals.filter(v => v === "A").length;
+  const countB = vals.filter(v => v === "B").length;
+  if (countA === 0 && countB === 0) {
+    return { mode: "neutral", label: "⚖️ 평판: 신입 수사관", short: "⚖️ 신입 수사관" };
+  }
+  if (countB > countA) {
+    return { mode: "shady", label: `🕶️ 평판: 어둠의 해결사 (A:${countA} · B:${countB})`, short: "🕶️ 어둠의 해결사" };
+  }
+  return { mode: "lawful", label: `⚖️ 평판: 냉철한 원칙주의자 (A:${countA} · B:${countB})`, short: "⚖️ 냉철한 원칙주의자" };
+}
+
+function updateReputationBadges() {
+  const rep = getReputationInfo();
+  const lBadge = document.getElementById("landing-reputation-badge");
+  const nPill = document.getElementById("nav-rep-pill");
+  if (lBadge) lBadge.innerText = rep.label;
+  if (nPill) nPill.innerText = rep.short;
+}
+
+function saveGeminiKey() {
+  const inp = document.getElementById("gemini-key-input");
+  const val = (inp?.value || "").trim();
+  game.geminiKey = val;
+  if (val) localStorage.setItem("r404_gemini_key", val);
+  else localStorage.removeItem("r404_gemini_key");
+  updateAiDot();
+  playSound("select");
+}
+
+function updateAiDot() {
+  const dot = document.getElementById("ai-dot");
+  if (!dot) return;
+  dot.className = game.geminiKey
+    ? "w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-pulse"
+    : "w-2 h-2 rounded-full bg-amber-400 shrink-0";
+}
+
+function isEvAnalyzed(ev) {
+  return Boolean(ev && (ev.analyzed || game.analyzedEvIds.includes(ev.id) || game.combinedEvIds.includes(ev.id)));
+}
+
+function evTitle(ev) {
+  return isEvAnalyzed(ev) && ev.analyzedName ? ev.analyzedName : ev.name;
+}
+
+function evDesc(ev) {
+  return isEvAnalyzed(ev) && ev.analyzedDesc ? ev.analyzedDesc : ev.desc;
+}
+
+function renderInventoryList() {
+  const st = getStage(game.stageNum);
+  const list = document.getElementById("inventory-list");
+  if (!list) return;
+  list.innerHTML = "";
+  document.getElementById("inv-count-text").innerText = `${game.collectedEvIds.length}개 확보`;
+
+  if (game.collectedEvIds.length === 0) {
+    list.innerHTML = `<div class="text-xs text-slate-500 bg-[#070a10] border border-slate-800 rounded-xl p-3.5 text-center">아직 확보한 증거품이 없습니다.<br/>현장 도면의 핀을 눌러 조사하세요.</div>`;
+    return;
+  }
+
+  game.collectedEvIds.forEach(evId => {
+    const ev = st.evidences.find(e => e.id === evId);
+    if (!ev) return;
+    const analyzed = isEvAnalyzed(ev);
+    const selected = game.selectedCourtEvId === ev.id;
+
+    const card = document.createElement("div");
+    card.className = `p-3 rounded-xl border cursor-pointer transition-all ${
+      selected
+        ? "bg-amber-950/70 border-amber-500 shadow-md"
+        : analyzed
+        ? "bg-[#0e131e] border-slate-700 hover:border-amber-500/70"
+        : "bg-[#0c1018] border-cyan-800/70 hover:border-cyan-400"
+    }`;
+    card.onclick = () => {
+      playSound("select");
+      if (!analyzed) {
+        game.csiTargetEvId = ev.id;
+        switchTab("csi", true);
+        return;
+      }
+      if (game.tab === "csi") {
+        if (!ev.isCombined) {
+          if (!game.slotA) game.slotA = ev.id;
+          else if (!game.slotB && game.slotA !== ev.id) game.slotB = ev.id;
+          else if (game.slotA !== ev.id && game.slotB !== ev.id) game.slotA = ev.id;
+          renderCsiWorkbench();
+        }
+        return;
+      }
+      game.selectedCourtEvId = game.selectedCourtEvId === ev.id ? null : ev.id;
+      renderInventoryList();
+      updateCourtSelectedBanner();
+    };
+
+    card.innerHTML = `
+      <div class="flex items-center justify-between gap-1.5 mb-1">
+        <span class="mono text-[10px] font-black px-1.5 py-0.5 rounded ${
+          analyzed ? "bg-emerald-950 text-emerald-300 border border-emerald-700" : "bg-cyan-950 text-cyan-300 border border-cyan-700"
+        }">${ev.code}</span>
+        <span class="text-[10px] font-bold ${selected ? "text-amber-300" : analyzed ? "text-emerald-400" : "text-cyan-400"}">
+          ${selected ? "✔ 선택됨" : analyzed ? "감정 완료" : "🔬 감식 필요"}
+        </span>
+      </div>
+      <div class="text-xs font-extrabold text-white mb-0.5">${escapeHtml(evTitle(ev))}</div>
+      <p class="text-[11px] text-slate-400 leading-snug">${escapeHtml(evDesc(ev))}</p>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function renderSceneMap() {
+  const st = getStage(game.stageNum);
+  const tut = document.getElementById("tutorial-guide-scene");
+  if (st.isTutorial) {
+    tut.innerText = "💡 [튜토리얼] 도면의 빛나는 핀(1, 2)을 눌러 증거를 채증한 뒤 [2. CSI 감식·결합]에서 감식을 완료하고 [3. 교차·역전 심문]으로 이동하세요!";
+    tut.classList.remove("hidden");
+  } else {
+    tut.classList.add("hidden");
+  }
+
+  document.getElementById("scene-phase-badge").innerText = `${game.phaseIdx + 1}차 심문 구역 개방`;
+  const svg = document.getElementById("scene-svg-map");
+  svg.innerHTML = `<rect width="400" height="200" fill="#080c14"/>`;
+  st.scene.rooms.forEach(r => {
+    const open = game.phaseIdx >= r.unlockPhase;
+    svg.innerHTML += `
+      <rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" rx="8"
+        fill="${open ? r.color : "#1e293b"}" fill-opacity="${open ? "0.14" : "0.18"}"
+        stroke="${open ? r.color : "#334155"}" stroke-width="1.5" stroke-dasharray="${open ? "none" : "4 3"}"/>
+      <text x="${r.x + 10}" y="${r.y + 18}" fill="${open ? "#e2e8f0" : "#64748b"}" font-size="9.5" font-weight="bold">
+        ${open ? r.label : `🔒 ${r.unlockPhase + 1}차 심문 돌입 시 개방`}
+      </text>
+    `;
+  });
+
+  const layer = document.getElementById("scene-pin-layer");
+  layer.innerHTML = "";
+  st.scene.hotspots.forEach(hs => {
+    const open = game.phaseIdx >= hs.unlockPhase;
+    const done = game.collectedEvIds.includes(hs.evId);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.style.left = `${(hs.x / 400) * 100}%`;
+    btn.style.top = `${(hs.y / 200) * 100}%`;
+    btn.className = `absolute -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full font-black text-xs flex items-center justify-center transition ${
+      !open
+        ? "bg-slate-800 border border-slate-600 text-slate-500 cursor-not-allowed"
+        : done
+        ? "bg-emerald-600 border-2 border-emerald-300 text-white shadow"
+        : "bg-amber-500 border-2 border-white text-slate-950 hotspot-pin hover:scale-110"
+    }`;
+    btn.innerText = !open ? "🔒" : done ? "✔" : hs.num;
+    btn.onclick = () => {
+      if (!open) {
+        playSound("damage");
+        document.getElementById("spot-inspector-box").innerHTML = `
+          <div class="text-center py-4">
+            <div class="text-2xl mb-1">🔒</div>
+            <h4 class="text-xs font-extrabold text-slate-300">${escapeHtml(hs.title)}</h4>
+            <p class="text-[11px] text-slate-400 mt-1">이 구역은 <strong class="text-amber-400">${hs.unlockPhase + 1}차 심문</strong>에 돌입해야 개방됩니다.</p>
+          </div>
+        `;
+        return;
+      }
+      inspectHotspot(hs.id);
+    };
+    layer.appendChild(btn);
+  });
+}
+
+function resetSpotInspector() {
+  document.getElementById("spot-inspector-box").innerHTML = `
+    <div class="text-xs text-slate-400 text-center my-auto py-4">
+      도면 위의 빛나는 <strong class="text-amber-400">조사 핀(1, 2...)</strong>을 클릭하여 현장 단서를 채증하세요.
+    </div>
+  `;
+}
+
+function inspectHotspot(hsId) {
+  playSound("select");
+  const st = getStage(game.stageNum);
+  const hs = st.scene.hotspots.find(h => h.id === hsId);
+  if (!hs) return;
+  game.selectedSpotId = hsId;
+  game.seqBuffer = [];
+
+  if (!game.collectedEvIds.includes(hs.evId)) {
+    game.collectedEvIds.push(hs.evId);
+  }
+  renderSceneMap();
+  renderInventoryList();
+  renderCsiWorkbench();
+
+  const ev = st.evidences.find(e => e.id === hs.evId);
+  document.getElementById("spot-inspector-box").innerHTML = `
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-extrabold text-emerald-400">✔ 채증 완료 — ${escapeHtml(hs.title)}</span>
+        <span class="mono text-[10px] text-slate-400">${ev ? ev.code : ""}</span>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed mb-2.5">${escapeHtml(hs.detail)}</p>
+      ${ev && !isEvAnalyzed(ev) ? `<button type="button" onclick="game.csiTargetEvId='${ev.id}';switchTab('csi')" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-extrabold px-3.5 py-2 rounded-xl">🔬 이 증거 CSI 감식하러 가기 ▶</button>` : ""}
+    </div>
+  `;
+}
+
+// ============================================================================
+// 3. TTS 음성 합성 & 6대 상황별 멀티트랙 BGM 엔진 + 실시간 볼륨 조절
+// ============================================================================
+let audioCtx = null;
+let masterGainNode = null;
+let bgmTimer = null;
+let bgmStep = 0;
+
+function ensureAudioCtx() {
+  try {
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      audioCtx = new Ctx();
+      masterGainNode = audioCtx.createGain();
+      masterGainNode.gain.setValueAtTime(game.volume, audioCtx.currentTime);
+      masterGainNode.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  } catch (_) {
+    return null;
+  }
+}
+
+function getAudioDestination() {
+  const ctx = ensureAudioCtx();
+  if (!ctx) return null;
+  return masterGainNode || ctx.destination;
+}
+
+function setMasterVolume(val) {
+  const num = Math.max(0, Math.min(100, Number(val)));
+  game.volume = num / 100;
+  saveCampaignState();
+
+  const lSlider = document.getElementById("landing-volume-slider");
+  const nSlider = document.getElementById("nav-volume-slider");
+  const lText = document.getElementById("landing-volume-text");
+  const nText = document.getElementById("nav-volume-text");
+  if (lSlider && Number(lSlider.value) !== num) lSlider.value = String(num);
+  if (nSlider && Number(nSlider.value) !== num) nSlider.value = String(num);
+  if (lText) lText.innerText = `${num}%`;
+  if (nText) nText.innerText = `${num}%`;
+
+  if (masterGainNode && audioCtx) {
+    masterGainNode.gain.setTargetAtTime(game.volume, audioCtx.currentTime, 0.02);
+  }
+
+  if (num > 0 && !game.audioOn) {
+    toggleAudioEngine();
+  }
+}
+
+function syncVolumeUi() {
+  const pct = Math.round((game.volume ?? 0.8) * 100);
+  const lSlider = document.getElementById("landing-volume-slider");
+  const nSlider = document.getElementById("nav-volume-slider");
+  const lText = document.getElementById("landing-volume-text");
+  const nText = document.getElementById("nav-volume-text");
+  if (lSlider) lSlider.value = String(pct);
+  if (nSlider) nSlider.value = String(pct);
+  if (lText) lText.innerText = `${pct}%`;
+  if (nText) nText.innerText = `${pct}%`;
+}
+
+function toggleTtsVoice() {
+  game.ttsOn = !game.ttsOn;
+  if (!game.ttsOn && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  const lIcon = document.getElementById("landing-tts-icon");
+  const lLbl = document.getElementById("landing-tts-label");
+  const nIcon = document.getElementById("nav-tts-icon");
+  if (lIcon) lIcon.innerText = game.ttsOn ? "🗣️" : "🙊";
+  if (lLbl) lLbl.innerText = game.ttsOn ? "보이스 TTS 켜짐" : "보이스 TTS 꺼짐";
+  if (nIcon) nIcon.innerText = game.ttsOn ? "🗣️" : "🙊";
+  playSound("select");
+}
+
+function speakCharacterVoice(text, person) {
+  if (!game.ttsOn || !("speechSynthesis" in window)) return;
+  try {
+    window.speechSynthesis.cancel();
+    const clean = String(text).replace(/["“”[\]⚡🔍💬]/g, "").trim();
+    if (!clean) return;
+    const utter = new SpeechSynthesisUtterance(clean);
+    utter.lang = "ko-KR";
+    const basePitch = person?.voicePitch || 1.0;
+    const baseRate = person?.voiceRate || 1.0;
+    utter.pitch = game.mood === "panic" || game.mood === "broken" ? Math.min(1.45, basePitch + 0.14) : basePitch;
+    utter.rate = game.mood === "panic" ? Math.min(1.25, baseRate + 0.08) : baseRate;
+    utter.volume = Math.min(1, Math.max(0.2, game.volume));
+    window.speechSynthesis.speak(utter);
+  } catch (_) {}
+}
+
+function toggleAudioEngine() {
+  game.audioOn = !game.audioOn;
+  const icon = game.audioOn ? "🔊" : "🔇";
+  const lIcon = document.getElementById("landing-sound-icon");
+  const lLbl = document.getElementById("landing-sound-label");
+  const nIcon = document.getElementById("nav-sound-icon");
+  if (lIcon) lIcon.innerText = icon;
+  if (lLbl) lLbl.innerText = game.audioOn ? "BGM 켜짐" : "BGM 켜기";
+  if (nIcon) nIcon.innerText = icon;
+
+  if (game.audioOn) {
+    ensureAudioCtx();
+    startBgm();
+    playSound("select");
+  } else {
+    stopBgm();
+  }
+}
+
+function switchBgmTrack(mode) {
+  if (game.bgmMode === mode && bgmTimer) return;
+  game.bgmMode = mode;
+  bgmStep = 0;
+  stopBgm();
+  if (game.audioOn) {
+    startBgm();
+  }
+}
+
+function startBgm() {
+  stopBgm();
+  if (!game.audioOn) return;
+
+  // 6대 상황별 테마 정의 (증폭된 선명한 출력 게인 적용)
+  const tracks = {
+    hub: {
+      interval: 340,
+      type: "sawtooth",
+      cutoff: 440,
+      vol: 0.15,
+      notes: [110.0, 110.0, 164.81, 130.81, 110.0, 110.0, 174.61, 146.83],
+      lead: [440.0, 0, 523.25, 493.88, 392.0, 0, 329.63, 392.0]
+    },
+    scene: {
+      interval: 420,
+      type: "sine",
+      cutoff: 980,
+      vol: 0.17,
+      notes: [146.83, 220.0, 261.63, 329.63, 130.81, 196.0, 246.94, 293.66],
+      lead: [587.33, 523.25, 493.88, 440.0, 392.0, 440.0, 493.88, 523.25]
+    },
+    court: {
+      interval: 230,
+      type: "sawtooth",
+      cutoff: 580,
+      vol: 0.16,
+      notes: [98.0, 98.0, 116.54, 130.81, 98.0, 98.0, 146.83, 130.81],
+      lead: [392.0, 466.16, 392.0, 587.33, 523.25, 466.16, 392.0, 349.23]
+    },
+    mindmap: {
+      interval: 210,
+      type: "triangle",
+      cutoff: 820,
+      vol: 0.17,
+      notes: [130.81, 261.63, 155.56, 311.13, 174.61, 349.23, 196.0, 392.0],
+      lead: [523.25, 622.25, 698.46, 783.99, 698.46, 622.25, 587.33, 493.88]
+    },
+    novel: {
+      interval: 560,
+      type: "sine",
+      cutoff: 740,
+      vol: 0.19,
+      notes: [174.61, 220.0, 261.63, 329.63, 164.81, 196.0, 246.94, 293.66],
+      lead: [440.0, 0, 523.25, 493.88, 392.0, 0, 349.23, 329.63]
+    },
+    confession: {
+      interval: 480,
+      type: "sawtooth",
+      cutoff: 490,
+      vol: 0.17,
+      notes: [87.31, 130.81, 174.61, 207.65, 82.41, 123.47, 164.81, 196.0],
+      lead: [349.23, 415.3, 523.25, 493.88, 329.63, 392.0, 493.88, 440.0]
+    }
+  };
+
+  const tr = tracks[game.bgmMode] || tracks.hub;
+
+  bgmTimer = setInterval(() => {
+    const ctx = ensureAudioCtx();
+    const dest = getAudioDestination();
+    if (!ctx || !dest) return;
+    const now = ctx.currentTime;
+    const idx = bgmStep % tr.notes.length;
+
+    const bassFreq = tr.notes[idx];
+    if (bassFreq > 0) {
+      const osc = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
+      osc.type = tr.type;
+      osc.frequency.setValueAtTime(bassFreq, now);
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(tr.cutoff, now);
+
+      const dur = (tr.interval / 1000) * 0.92;
+      gain.gain.setValueAtTime(tr.vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(dest);
+      osc.start(now);
+      osc.stop(now + dur + 0.02);
+    }
+
+    const leadFreq = tr.lead[idx];
+    if (leadFreq > 0) {
+      const lOsc = ctx.createOscillator();
+      const lGain = ctx.createGain();
+      lOsc.type = game.bgmMode === "novel" || game.bgmMode === "scene" ? "sine" : "triangle";
+      lOsc.frequency.setValueAtTime(leadFreq, now);
+
+      const lDur = (tr.interval / 1000) * 0.85;
+      lGain.gain.setValueAtTime(tr.vol * 0.72, now);
+      lGain.gain.exponentialRampToValueAtTime(0.001, now + lDur);
+
+      lOsc.connect(lGain);
+      lGain.connect(dest);
+      lOsc.start(now);
+      lOsc.stop(now + lDur + 0.02);
+    }
+
+    bgmStep++;
+  }, tr.interval);
+}
+
+function stopBgm() {
+  if (bgmTimer) {
+    clearInterval(bgmTimer);
+    bgmTimer = null;
+  }
+}
+
+function playSound(type, customPitch = 1.0) {
+  if (!game.audioOn) return;
+  const ctx = ensureAudioCtx();
+  const dest = getAudioDestination();
+  if (!ctx || !dest) return;
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(dest);
+
+  if (type === "tick") {
+    osc.type = "square";
+    osc.frequency.setValueAtTime(680 * customPitch, now);
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.022);
+    osc.start(now);
+    osc.stop(now + 0.025);
+  } else if (type === "select" || type === "send") {
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(760, now + 0.07);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+    osc.start(now);
+    osc.stop(now + 0.1);
+  } else if (type === "scan") {
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(360, now);
+    osc.frequency.linearRampToValueAtTime(980, now + 0.35);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+    osc.start(now);
+    osc.stop(now + 0.44);
+  } else if (type === "combine") {
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.setValueAtTime(554.37, now + 0.08);
+    osc.frequency.setValueAtTime(659.25, now + 0.16);
+    gain.gain.setValueAtTime(0.24, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc.start(now);
+    osc.stop(now + 0.36);
+  } else if (type === "press") {
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(580, now + 0.14);
+    gain.gain.setValueAtTime(0.22, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  } else if (type === "breakthrough") {
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.28);
+    gain.gain.setValueAtTime(0.32, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+    osc.start(now);
+    osc.stop(now + 0.36);
+  } else if (type === "slip") {
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(587.33, now);
+    osc.frequency.setValueAtTime(880, now + 0.09);
+    gain.gain.setValueAtTime(0.26, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+    osc.start(now);
+    osc.stop(now + 0.25);
+  } else if (type === "stamp") {
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(165, now);
+    osc.frequency.exponentialRampToValueAtTime(52, now + 0.35);
+    gain.gain.setValueAtTime(0.38, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc.start(now);
+    osc.stop(now + 0.42);
+  } else if (type === "damage") {
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(140, now);
+    osc.frequency.linearRampToValueAtTime(85, now + 0.22);
+    gain.gain.setValueAtTime(0.28, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    osc.start(now);
+    osc.stop(now + 0.26);
+  }
+}
+
+function triggerDialogueEffect(type, labelText) {
+  if (type === "breakthrough") {
+    const sw = document.getElementById("fx-shockwave");
+    if (sw) {
+      sw.classList.remove("hidden", "shockwave-anim");
+      void sw.offsetWidth;
+      sw.classList.add("shockwave-anim");
+      setTimeout(() => sw.classList.add("hidden"), 560);
+    }
+    document.getElementById("app-body")?.classList.add("shake-now");
+    setTimeout(() => document.getElementById("app-body")?.classList.remove("shake-now"), 400);
+  }
+  if (labelText) {
+    const toast = document.getElementById("fx-slip-toast");
+    const txt = document.getElementById("fx-slip-text");
+    const ico = document.getElementById("fx-slip-icon");
+    if (toast && txt && ico) {
+      ico.innerText = type === "breakthrough" ? "💥" : "⚡";
+      txt.innerText = labelText;
+      toast.classList.remove("hidden", "slip-banner-anim");
+      void toast.offsetWidth;
+      toast.classList.add("slip-banner-anim");
+      setTimeout(() => toast.classList.add("hidden"), 2300);
+    }
+  }
+}
+
+function drawPortraitSvg(person, mood = "calm") {
+  const s = person || { themeColor: "#38bdf8", coatColor: "#1e293b", hairColor: "#0f172a", hasGlasses: false };
+  const isPanic = mood === "panic";
+  const isBroken = mood === "broken";
+  const isAlert = mood === "alert";
+
+  const bgGrad = isBroken ? "#2a0a10" : isPanic ? "#27150a" : isAlert ? "#161d2e" : "#0f172a";
+  const browLeft = isBroken ? "M34 45 L45 41" : isPanic ? "M34 43 L45 40" : isAlert ? "M34 39 L45 42" : "M34 40 L45 40";
+  const browRight = isBroken ? "M66 45 L55 41" : isPanic ? "M66 43 L55 40" : isAlert ? "M66 39 L55 42" : "M66 40 L55 40";
+  const mouthPath = isBroken ? "M41 68 Q50 61 59 68" : isPanic ? "M42 66 Q50 63 58 66" : isAlert ? "M42 65 L58 65" : "M42 64 Q50 67 58 64";
+  const sweat = (isPanic || isBroken) ? `<path d="M71 42 C74 47 74 51 71 51 C68 51 68 47 71 42 Z" fill="#38bdf8" opacity="0.9"/>` : "";
+  const glasses = s.hasGlasses
+    ? `<rect x="33" y="43" width="14" height="9" rx="2" fill="none" stroke="#94a3b8" stroke-width="1.6"/>
+       <rect x="53" y="43" width="14" height="9" rx="2" fill="none" stroke="#94a3b8" stroke-width="1.6"/>
+       <line x1="47" y1="47" x2="53" y2="47" stroke="#94a3b8" stroke-width="1.5"/>`
+    : "";
+
+  return `
+    <svg viewBox="0 0 100 100" class="w-full h-full block">
+      <rect width="100" height="100" fill="${bgGrad}"/>
+      <circle cx="50" cy="24" r="36" fill="${s.themeColor}" opacity="0.18"/>
+      <path d="M22 100 C24 78 36 73 50 73 C64 73 76 78 78 100 Z" fill="${s.coatColor}"/>
+      <polygon points="44,73 50,86 56,73" fill="#e2e8f0" opacity="0.85"/>
+      <rect x="44" y="64" width="12" height="12" rx="4" fill="#eab696"/>
+      <ellipse cx="50" cy="48" rx="18" ry="21" fill="#f1c2a3"/>
+      <path d="M31 44 C31 24 69 24 69 44 C66 33 56 30 50 31 C42 30 34 34 31 44 Z" fill="${s.hairColor}"/>
+      <path d="${browLeft}" stroke="#1e293b" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="${browRight}" stroke="#1e293b" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="40" cy="47.5" r="${isPanic || isBroken ? 2.4 : 2}" fill="#0f172a"/>
+      <circle cx="60" cy="47.5" r="${isPanic || isBroken ? 2.4 : 2}" fill="#0f172a"/>
+      ${glasses}
+      <path d="${mouthPath}" fill="none" stroke="#7f1d1d" stroke-width="2" stroke-linecap="round"/>
+      ${sweat}
+    </svg>
+  `;
+}
+
+function startEcgMonitor() {
+  const canvas = document.getElementById("ecg-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  let phase = 0;
+  setInterval(() => {
+    const baseBpm = game.mood === "broken" ? 156 : game.mood === "panic" ? 132 : game.mood === "alert" ? 98 : 74;
+    const bpm = Math.min(185, baseBpm + Math.round(game.pressure * 0.35) + game.bpmSpike);
+    if (game.bpmSpike > 0) game.bpmSpike = Math.max(0, game.bpmSpike - 1);
+
+    const bpmEl = document.getElementById("bpm-value-text");
+    if (bpmEl) bpmEl.innerText = `${bpm} BPM`;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.fillStyle = "rgba(6, 8, 13, 0.28)";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = bpm >= 125 ? "#f43f5e" : bpm >= 95 ? "#f59e0b" : "#10b981";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    phase += bpm / 35;
+    for (let x = 0; x < w; x += 3) {
+      const t = (x + phase) % 60;
+      let y = h * 0.52;
+      if (t > 22 && t < 26) y -= 6;
+      else if (t >= 26 && t < 29) y += 10;
+      else if (t >= 29 && t < 32) y -= 22;
+      else if (t >= 32 && t < 35) y += 12;
+      else if (t >= 40 && t < 47) y -= 5;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }, 65);
+}
+
+// ============================================================================
+// 4. 동적 캠페인 브리핑 렌더링 (1번째 튜토리얼 → 2번째부터 4개 사건 선택 보드)
+// ============================================================================
+function renderCampaignLanding() {
+  const area = document.getElementById("landing-dynamic-area");
+  const badge = document.getElementById("landing-mode-badge");
+  const summary = document.getElementById("landing-progress-summary");
+  if (!area) return;
+
+  updateReputationBadges();
+  if (summary) {
+    summary.innerText = `해결 사건: ${game.solvedNums.length}건 · 모든 진행 상황 자동 저장됨`;
+  }
+
+  if (!game.tutorialCompleted) {
+    const tut = STAGE_DATA[0];
+    if (badge) badge.innerText = "TUTORIAL CASE // 01";
+    area.innerHTML = `
+      <div class="bg-[#0c111d]/95 border-2 border-amber-500/60 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col gap-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="mono text-xs font-black px-3 py-1 rounded-full bg-amber-600 text-white">CASE 01 // SYSTEM TUTORIAL</span>
+          <span class="text-xs text-amber-300 font-bold">${tut.difficulty}</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div class="w-20 h-20 rounded-2xl overflow-hidden border-2 border-amber-500/60 shrink-0 shadow-lg">
+            ${drawPortraitSvg(tut.suspect, "calm")}
+          </div>
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-black text-white">${escapeHtml(tut.title)}</h2>
+            <p class="text-xs sm:text-sm text-amber-300 mt-1 font-semibold">핵심 용의자: ${escapeHtml(tut.suspect.name)} (${escapeHtml(tut.suspect.role)}) · 참고인: ${escapeHtml(tut.witness.name)}</p>
+          </div>
+        </div>
+
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed bg-[#070a10] border border-slate-800 rounded-2xl p-4">
+          ${escapeHtml(tut.summary)}<br/>
+          <span class="text-amber-300 font-semibold mt-1.5 block">※ 첫 번째 사건에서는 현장 수색, CSI 감식, 복수 용의자·참고인 교차 심문, 추리 마인드맵 완성까지 전체 수사 방식을 단계별로 익힙니다.</span>
+        </p>
+
+        <button type="button" onclick="startStage(1)"
+          class="w-full sm:w-auto self-center bg-amber-600 hover:bg-amber-500 active:scale-95 text-white font-black text-base sm:text-lg px-10 py-4 rounded-2xl shadow-[0_0_35px_rgba(245,158,11,0.45)] transition flex items-center justify-center gap-2.5">
+          <span>▶</span>
+          <span>튜토리얼 수사 개시 (CASE 01)</span>
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  if (badge) badge.innerText = "ACTIVE DISPATCH BOARD // 4 CASES";
+  const cardsHtml = game.activeBoardNums.map((num, idx) => {
+    const st = getStage(num);
+    const isBoss = st.num === 10;
+    return `
+      <div onclick="startStage(${st.num})"
+        class="bg-[#0d121e] hover:bg-[#141c2e] border ${isBoss ? "border-rose-600/80 shadow-[0_0_25px_rgba(244,63,94,0.2)]" : "border-slate-800 hover:border-amber-500/70"} rounded-2xl p-4 flex flex-col justify-between gap-3 cursor-pointer transition-all group shadow-lg">
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <span class="mono text-[10px] font-black px-2 py-0.5 rounded ${isBoss ? "bg-rose-600 text-white" : "bg-amber-600 text-white"}">
+              CASE ${String(st.num).padStart(2, "0")} · SLOT 0${idx + 1}
+            </span>
+            <span class="text-[10px] font-bold ${isBoss ? "text-rose-400" : "text-amber-400"}">${st.difficulty}</span>
+          </div>
+          <div class="text-[10px] mono text-cyan-400 mb-2">${escapeHtml(st.category)}</div>
+
+          <div class="flex items-center gap-3 mb-2.5">
+            <div class="w-12 h-12 rounded-xl overflow-hidden border border-slate-700 shrink-0">
+              ${drawPortraitSvg(st.suspect, "calm")}
+            </div>
+            <div class="min-w-0">
+              <h3 class="font-extrabold text-sm text-white group-hover:text-amber-300 transition truncate">${escapeHtml(st.title)}</h3>
+              <p class="text-[11px] text-slate-400 truncate">${escapeHtml(st.suspect.name)} · ${escapeHtml(st.suspect.role)}</p>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-300 leading-relaxed line-clamp-2">${escapeHtml(st.summary)}</p>
+        </div>
+
+        <div class="pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
+          <span class="text-[11px] text-slate-400">👥 참고인: ${escapeHtml(st.witness?.name || "없음")}</span>
+          <span class="font-extrabold ${isBoss ? "text-rose-400" : "text-amber-400"} group-hover:translate-x-1 transition-transform">사건 출동 ▶</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  area.innerHTML = `
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-sm font-extrabold text-amber-400 uppercase tracking-wider">
+          📂 출동 가능 미해결 사건 (원하는 사건 1건을 선택해 수사하세요)
+        </h2>
+        <span class="text-xs text-slate-400">※ 해결된 사건 자리에는 새로운 사건이 계속 충원됩니다.</span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+        ${cardsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function resetCampaignProgress() {
+  const btn = document.getElementById("landing-reset-btn");
+  if (!game.resetArmed) {
+    game.resetArmed = true;
+    btn.innerText = "⚠️ 한 번 더 누르면 전체 수사 기록 초기화";
+    return;
+  }
+  game.resetArmed = false;
+  game.tutorialCompleted = false;
+  game.activeBoardNums = [2, 3, 4, 5];
+  game.solvedNums = [];
+  game.ranks = {};
+  game.endings = {};
+  game.memos = {};
+  localStorage.removeItem(SAVE_KEY);
+  btn.innerText = "전체 수사 기록 초기화";
+  renderCampaignLanding();
+}
+
+function backToCampaignBoard() {
+  if (game.typingTimer) {
+    clearInterval(game.typingTimer);
+    game.typingTimer = null;
+  }
+  game.isTyping = false;
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  document.getElementById("result-modal").classList.add("hidden");
+  document.getElementById("confession-modal").classList.add("hidden");
+  document.getElementById("story-theater-modal").classList.add("hidden");
+  document.getElementById("novel-book-modal").classList.add("hidden");
+  document.getElementById("landing-screen").classList.remove("hidden");
+  switchBgmTrack("hub");
+  renderCampaignLanding();
+}
+
+// ============================================================================
+// 5. 스테이지 시작 & 스토리 시어터 & 탭 전환
+// ============================================================================
+function startStage(num) {
+  playSound("select");
+  if (game.typingTimer) {
+    clearInterval(game.typingTimer);
+    game.typingTimer = null;
+  }
+
+  game.stageNum = num;
+  const st = getStage(num);
+  game.tab = "scene";
+  game.interrogationTarget = "suspect";
+  game.hp = 5;
+  game.maxHp = 5;
+  game.mistakes = 0;
+  game.solvedSpotIds = [];
+  game.collectedEvIds = [];
+  game.analyzedEvIds = [];
+  game.combinedEvIds = [];
+  game.unlockedIntelIds = [];
+  game.witnessBroken = false;
+  game.selectedSpotId = null;
+  game.seqBuffer = [];
+  game.csiTargetEvId = null;
+  game.slotA = null;
+  game.slotB = null;
+  game.mindmapSlots = { motive: null, means: null, opportunity: null };
+  game.phaseIdx = 0;
+  game.stmtIdx = 0;
+  game.selectedCourtEvId = null;
+  game.pressedStmtIds = [];
+  game.brokenStmtIds = [];
+  game.pressure = 0;
+  game.mood = "calm";
+  game.isOver = false;
+  game.isTyping = false;
+  game.bpmSpike = 0;
+  game.aiHistory = [];
+
+  const keyInp = document.getElementById("gemini-key-input");
+  if (keyInp && game.geminiKey) keyInp.value = game.geminiKey;
+  updateAiDot();
+  updateReputationBadges();
+
+  document.getElementById("landing-screen").classList.add("hidden");
+  document.getElementById("newspaper-modal").classList.add("hidden");
+  document.getElementById("result-modal").classList.add("hidden");
+  document.getElementById("confession-modal").classList.add("hidden");
+  document.getElementById("novel-book-modal").classList.add("hidden");
+
+  document.getElementById("nav-case-badge").innerText = `CASE ${String(st.num).padStart(2, "0")}`;
+  document.getElementById("nav-ep-title").innerText = st.title;
+  document.getElementById("scene-subtitle").innerText = st.subtitle;
+  document.getElementById("new-zone-dot").classList.add("hidden");
+  document.getElementById("mindmap-ready-dot").classList.add("hidden");
+  document.getElementById("csi-feedback").innerText = "";
+  document.getElementById("combine-feedback").innerText = "";
+  document.getElementById("mindmap-feedback").innerText = "";
+
+  const rep = getReputationInfo();
+  const log = document.getElementById("interrogation-chat-log");
+  log.innerHTML = "";
+  pushSystemChat(`[CASE ${String(st.num).padStart(2, "0")}: ${st.title}] 심문 녹화 개시. 표면적 알리바이 뒤에 숨겨진 진실까지 파헤치십시오.`);
+  if (rep.mode === "shady") {
+    pushSystemChat(`🕶️ [평판 반응] 용의자가 당신의 '어둠의 해결사' 소문을 의식하며 경계합니다.`);
+  } else if (rep.mode === "lawful") {
+    pushSystemChat(`⚖️ [평판 반응] 용의자가 당신의 '냉철한 원칙주의자' 명성에 긴장합니다.`);
+  }
+  const firstStmt = st.testimonyPhases?.[0]?.statements?.[0]?.text || st.suspect.openingLine;
+  pushSuspectChat(`💬 [증언 1 진술] "${firstStmt}"`, null, false);
+
+  renderSceneMap();
+  resetSpotInspector();
+  renderInventoryList();
+  renderCsiWorkbench();
+  renderCourtPanel();
+  renderMindmapBoard();
+  updateRightStatusPanel();
+  switchTab("scene", true);
+}
+
+function restartCurrentStage() {
+  startStage(game.stageNum);
+}
+
+function switchTab(tabName, silent = false) {
+  game.tab = tabName;
+  ["scene", "csi", "court", "mindmap"].forEach(t => {
+    const view = document.getElementById(`view-${t}`);
+    const btn = document.getElementById(`tab-btn-${t}`);
+    if (view) view.classList.toggle("hidden", t !== tabName);
+    if (btn) {
+      btn.className = t === tabName
+        ? "px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-extrabold transition bg-amber-600 text-white relative shrink-0"
+        : "px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-400 hover:text-white relative shrink-0";
+    }
+  });
+  if (tabName === "scene") {
+    document.getElementById("new-zone-dot")?.classList.add("hidden");
+    renderSceneMap();
+    switchBgmTrack("scene");
+  } else if (tabName === "csi") {
+    renderCsiWorkbench();
+    switchBgmTrack("scene");
+  } else if (tabName === "court") {
+    renderCourtPanel();
+    scrollChatBottom(true);
+    switchBgmTrack("court");
+  } else if (tabName === "mindmap") {
+    document.getElementById("mindmap-ready-dot")?.classList.add("hidden");
+    renderMindmapBoard();
+    switchBgmTrack("mindmap");
+  }
+  if (!silent) playSound("select");
+}
+
+function openStoryTheater(modeBadge, title, slides, cb) {
+  game.storyQueue = slides;
+  game.storyIdx = 0;
+  game.storyCallback = cb;
+  document.getElementById("story-mode-badge").innerText = modeBadge;
+  document.getElementById("story-theater-title").innerText = title;
+  document.getElementById("story-theater-modal").classList.remove("hidden");
+  switchBgmTrack("novel");
+  renderStorySlide();
+}
+
+function renderStorySlide() {
+  const st = getStage(game.stageNum);
+  const slide = game.storyQueue[game.storyIdx];
+  if (!slide) {
+    closeStoryTheater();
+    return;
+  }
+  playSound("tick");
+  document.getElementById("story-scene-counter").innerText = `${game.storyIdx + 1} / ${game.storyQueue.length}`;
+  document.getElementById("story-location-tag").innerText = slide.location || "CASE RECORD";
+  document.getElementById("story-speaker-name").innerText = slide.speaker || "수사 기록";
+  document.getElementById("story-sub-caption").innerText = `${st.title} — ${st.suspect.role}`;
+  document.getElementById("story-body-text").innerText = slide.text || "";
+
+  const av = document.getElementById("story-speaker-avatar");
+  if (slide.useSuspectPortrait) {
+    av.innerHTML = drawPortraitSvg(st.suspect, game.isOver ? "broken" : "calm");
+  } else {
+    av.innerHTML = `<span>${slide.emoji || "📁"}</span>`;
+  }
+  document.getElementById("story-next-btn").innerText = game.storyIdx >= game.storyQueue.length - 1 ? "확인 및 계속 ▶" : "다음 장면 ▶";
+}
+
+function nextStorySlide() {
+  playSound("select");
+  if (game.storyIdx < game.storyQueue.length - 1) {
+    game.storyIdx++;
+    renderStorySlide();
+  } else {
+    closeStoryTheater();
+  }
+}
+
+function skipStoryTheater() {
+  playSound("select");
+  closeStoryTheater();
+}
+
+function closeStoryTheater() {
+  document.getElementById("story-theater-modal").classList.add("hidden");
+  const cb = game.storyCallback;
+  game.storyCallback = null;
+  switchBgmTrack(game.tab === "court" ? "court" : game.tab === "mindmap" ? "mindmap" : "scene");
+  if (typeof cb === "function") cb();
+}
+
+// ============================================================================
+// 5-B. 사건 전말 소설책 리더 (CASE NOVEL BOOK READER)
+// ============================================================================
+function openNovelReaderForCurrentCase(endingChoice = null, onCloseCb = null) {
+  const st = getStage(game.stageNum);
+  const chosenEnding = endingChoice || game.endings[st.num] || null;
+  const chapters = Array.isArray(st.novelChapters) ? [...st.novelChapters] : [];
+
+  if (chosenEnding) {
+    const epilogueText = chosenEnding === "B" ? st.epilogueB : st.epilogueA;
+    chapters.push({
+      tag: `최종 기록 // ENDING ${chosenEnding}`,
+      loc: chosenEnding === "B" ? "SHADOW PACT · 어둠의 거래 이후" : "JUSTICE SERVED · 법의 심판 이후",
+      heading: chosenEnding === "B" ? "보론. 어둠 속에서 맺어진 밀약의 대가" : "보론. 심판대 위에 선 진실의 무게",
+      body: `${epilogueText}\n\n사건 번호 CASE ${String(st.num).padStart(2, "0")} [${st.title}]의 모든 기록은 심문실 404 영구 보존 서고에 봉인되었다.`,
+      quote: st.hiddenTruth
+    });
+  }
+
+  game.novelPages = chapters;
+  game.novelPageIdx = 0;
+  game.novelCloseCb = onCloseCb;
+
+  document.getElementById("novel-book-kicker").innerText = `CASE ${String(st.num).padStart(2, "0")} // COMPLETE CHRONICLE`;
+  document.getElementById("novel-book-title").innerText = `${st.title} — 사건 전말 기록서`;
+  document.getElementById("novel-book-modal").classList.remove("hidden");
+  switchBgmTrack("novel");
+  renderNovelBookPage();
+}
+
+function renderNovelBookPage() {
+  const page = game.novelPages[game.novelPageIdx];
+  if (!page) return;
+  playSound("tick");
+
+  const total = game.novelPages.length;
+  document.getElementById("novel-page-indicator").innerText = `${game.novelPageIdx + 1} / ${total} 장`;
+  document.getElementById("novel-chapter-tag").innerText = page.tag || `CHAPTER ${game.novelPageIdx + 1}`;
+  document.getElementById("novel-chapter-loc").innerText = page.loc || "ARCHIVE";
+  document.getElementById("novel-chapter-heading").innerText = page.heading || "";
+  document.getElementById("novel-chapter-body").innerText = page.body || "";
+
+  const qBox = document.getElementById("novel-chapter-quote-box");
+  const qTxt = document.getElementById("novel-chapter-quote");
+  if (page.quote) {
+    qTxt.innerText = page.quote;
+    qBox.classList.remove("hidden");
+  } else {
+    qBox.classList.add("hidden");
+  }
+
+  const animBox = document.getElementById("novel-page-anim-box");
+  animBox.classList.remove("novel-page-anim");
+  void animBox.offsetWidth;
+  animBox.classList.add("novel-page-anim");
+
+  const container = document.getElementById("novel-page-container");
+  if (container) container.scrollTop = 0;
+
+  const prevBtn = document.getElementById("novel-prev-btn");
+  const nextBtn = document.getElementById("novel-next-btn");
+  prevBtn.disabled = game.novelPageIdx === 0;
+  nextBtn.innerText = game.novelPageIdx >= total - 1 ? "독서 완료 및 닫기 ✔" : "다음 페이지 ▶";
+
+  const dots = document.getElementById("novel-page-dots");
+  dots.innerHTML = game.novelPages
+    .map((_, idx) => `<button type="button" onclick="jumpNovelPage(${idx})" class="w-2.5 h-2.5 rounded-full transition ${idx === game.novelPageIdx ? "bg-amber-400 scale-125" : "bg-stone-600 hover:bg-stone-400"}"></button>`)
+    .join("");
+}
+
+function jumpNovelPage(idx) {
+  if (idx >= 0 && idx < game.novelPages.length) {
+    game.novelPageIdx = idx;
+    renderNovelBookPage();
+  }
+}
+
+function turnNovelPage(delta) {
+  playSound("select");
+  const next = game.novelPageIdx + delta;
+  if (next < 0) return;
+  if (next >= game.novelPages.length) {
+    closeNovelBookModal();
+    return;
+  }
+  game.novelPageIdx = next;
+  renderNovelBookPage();
+}
+
+function closeNovelBookModal() {
+  document.getElementById("novel-book-modal").classList.add("hidden");
+  const cb = game.novelCloseCb;
+  game.novelCloseCb = null;
+  if (typeof cb === "function") {
+    cb();
+  } else {
+    switchBgmTrack(game.isOver ? "confession" : game.tab === "court" ? "court" : game.tab === "mindmap" ? "mindmap" : "scene");
+  }
+}
+
+function renderCsiWorkbench() {
+  const st = getStage(game.stageNum);
+  const unList = document.getElementById("csi-unidentified-list");
+  unList.innerHTML = "";
+  const unanalyzed = game.collectedEvIds.map(id => st.evidences.find(e => e.id === id)).filter(ev => ev && !isEvAnalyzed(ev));
+
+  if (unanalyzed.length === 0) {
+    unList.innerHTML = `<span class="text-[11px] text-slate-500">미감식 증거가 없습니다.</span>`;
+  } else {
+    unanalyzed.forEach(ev => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = `text-[11px] font-bold px-2.5 py-1 rounded-lg border ${game.csiTargetEvId === ev.id ? "bg-cyan-600 text-white border-cyan-300" : "bg-slate-800 text-cyan-300 border-slate-700"}`;
+      b.innerText = `${ev.code} ${ev.name}`;
+      b.onclick = () => { game.csiTargetEvId = ev.id; renderCsiWorkbench(); };
+      unList.appendChild(b);
+    });
+  }
+
+  const target = st.evidences.find(e => e.id === game.csiTargetEvId);
+  document.getElementById("csi-selected-name").innerText = target ? `${target.code}: ${evTitle(target)}` : "미감식 증거를 선택하세요";
+
+  const sA = st.evidences.find(e => e.id === game.slotA);
+  const sB = st.evidences.find(e => e.id === game.slotB);
+  document.getElementById("combine-slot-a").innerText = sA ? `${sA.code} ${evTitle(sA)}` : "비어 있음";
+  document.getElementById("combine-slot-b").innerText = sB ? `${sB.code} ${evTitle(sB)}` : "비어 있음";
+
+  const cand = document.getElementById("combine-candidates");
+  cand.innerHTML = "";
+  game.collectedEvIds.map(id => st.evidences.find(e => e.id === id)).filter(ev => ev && isEvAnalyzed(ev) && !ev.isCombined).forEach(ev => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    const inSlot = game.slotA === ev.id || game.slotB === ev.id;
+    btn.className = `text-[11px] border px-2.5 py-1 rounded-lg ${inSlot ? "bg-purple-800/70 border-purple-400 text-white font-bold" : "bg-slate-800 hover:bg-purple-900/60 border-slate-700 text-slate-200"}`;
+    btn.innerText = `${inSlot ? "✔" : "+"} ${ev.code} ${evTitle(ev)}`;
+    btn.onclick = () => {
+      playSound("select");
+      if (game.slotA === ev.id) game.slotA = null;
+      else if (game.slotB === ev.id) game.slotB = null;
+      else if (!game.slotA) game.slotA = ev.id;
+      else if (!game.slotB) game.slotB = ev.id;
+      else game.slotA = ev.id;
+      renderCsiWorkbench();
+    };
+    cand.appendChild(btn);
+  });
+}
+
+function runCsiAnalysis(tool) {
+  const st = getStage(game.stageNum);
+  const ev = st.evidences.find(e => e.id === game.csiTargetEvId);
+  const fb = document.getElementById("csi-feedback");
+  if (!ev) { fb.innerText = "⚠️ 먼저 감식할 증거품을 선택하세요."; return; }
+  if (isEvAnalyzed(ev)) { fb.innerText = "ℹ️ 이미 감식이 완료된 증거품입니다."; return; }
+  if (ev.requiredTool === tool) {
+    playSound("scan");
+    game.analyzedEvIds.push(ev.id);
+    fb.innerHTML = `<span class="text-emerald-400 font-bold">✅ 감식 성공!</span> [${escapeHtml(evTitle(ev))}] 데이터가 추출되었습니다.`;
+    renderInventoryList();
+    renderCsiWorkbench();
+  } else {
+    playSound("damage");
+    fb.innerHTML = `<span class="text-rose-400 font-bold">❌ 장비 불일치:</span> 다른 과학수사 장비를 시도하세요.`;
+  }
+}
+
+function clearCombineSlot(slot) {
+  if (slot === "A") game.slotA = null;
+  else game.slotB = null;
+  renderCsiWorkbench();
+}
+
+function combineSelectedEvidences() {
+  const st = getStage(game.stageNum);
+  const fb = document.getElementById("combine-feedback");
+  if (!game.slotA || !game.slotB) { fb.innerText = "⚠️ 슬롯 A와 B에 증거 2개를 모두 배치하세요."; return; }
+  const combo = st.evidences.find(ev => ev.isCombined && ev.combineFrom.includes(game.slotA) && ev.combineFrom.includes(game.slotB));
+  if (!combo) {
+    playSound("damage");
+    fb.innerHTML = `<span class="text-rose-400 font-bold">❌ 결합 실패:</span> 선택한 두 단서만으로는 모순을 도출할 수 없습니다.`;
+    return;
+  }
+  playSound("combine");
+  if (!game.collectedEvIds.includes(combo.id)) game.collectedEvIds.push(combo.id);
+  if (!game.combinedEvIds.includes(combo.id)) game.combinedEvIds.push(combo.id);
+  game.slotA = null;
+  game.slotB = null;
+  fb.innerHTML = `<span class="text-purple-300 font-extrabold">⚡ 결정적 증거 도출 성공!</span> [${escapeHtml(combo.name)}] 확보 완료!`;
+  renderInventoryList();
+  renderCsiWorkbench();
+}
+
+// ============================================================================
+// 7. 복수 용의자·참고인 교차 심문 & 대화 중심형 추궁
+// ============================================================================
+function switchInterrogationTarget(target) {
+  const st = getStage(game.stageNum);
+  if (target === "witness" && !st.witness) return;
+  game.interrogationTarget = target;
+  playSound("select");
+
+  const btnS = document.getElementById("target-btn-suspect");
+  const btnW = document.getElementById("target-btn-witness");
+  btnS.className = target === "suspect"
+    ? "px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-amber-600 text-white transition"
+    : "px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+  btnW.className = target === "witness"
+    ? "px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-cyan-600 text-white transition"
+    : "px-2.5 py-1 rounded-lg text-[11px] font-extrabold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+
+  if (target === "witness" && st.witness) {
+    pushSystemChat(`👥 [참고인 교차 심문 전환] ${st.witness.name}(${st.witness.role})이(가) 입실했습니다.`);
+    pushSuspectChat(`💬 [참고인 진술] "${st.witness.testimony}"`, null, false);
+  } else {
+    const curStmt = activeTestimonyPhase().statements[game.stmtIdx];
+    pushSystemChat(`⚖️ [핵심 용의자 심문 복귀] ${st.suspect.name} 심문을 재개합니다.`);
+    if (curStmt) {
+      pushSuspectChat(`💬 [증언 ${game.stmtIdx + 1} 진술] "${curStmt.text}"`, null, false);
+    }
+  }
+  renderCourtPanel();
+  updateRightStatusPanel();
+}
+
+function activeTestimonyPhase() {
+  const st = getStage(game.stageNum);
+  return st.testimonyPhases[game.phaseIdx] || st.testimonyPhases[0];
+}
+
+function renderCourtPanel() {
+  const st = getStage(game.stageNum);
+  const tut = document.getElementById("tutorial-guide-court");
+  if (st.isTutorial && st.tutorialGuide && game.interrogationTarget === "suspect") {
+    const msg = st.tutorialGuide[`court${game.phaseIdx}`];
+    if (msg) {
+      tut.innerText = msg;
+      tut.classList.remove("hidden");
+    } else tut.classList.add("hidden");
+  } else tut.classList.add("hidden");
+
+  const wTag = document.getElementById("witness-status-tag");
+  if (wTag) {
+    wTag.innerText = game.witnessBroken ? "✔ 교차 진술 모순 확보됨" : `참고인: ${st.witness?.name || "없음"}`;
+  }
+
+  if (game.interrogationTarget === "witness" && st.witness) {
+    document.getElementById("court-phase-title").innerText = `👥 참고인 교차 심문 — ${st.witness.name}`;
+    document.getElementById("court-stmt-counter").innerText = game.witnessBroken ? "진술 번복 완료" : "교차 검증 중";
+    document.getElementById("court-stmt-text").innerText = game.witnessBroken ? st.witness.breakReply : st.witness.testimony;
+  } else {
+    const phase = activeTestimonyPhase();
+    const stmt = phase.statements[game.stmtIdx] || phase.statements[0];
+    document.getElementById("court-phase-title").innerText = phase.title;
+    document.getElementById("court-stmt-counter").innerText = `증언 ${game.stmtIdx + 1} / ${phase.statements.length}`;
+    document.getElementById("court-stmt-text").innerText = stmt.text;
+  }
+  updateCourtSelectedBanner();
+  updateIntelCountLabel();
+}
+
+function updateIntelCountLabel() {
+  const st = getStage(game.stageNum);
+  const total = st.testimonyPhases.reduce((acc, p) => acc + p.statements.length, 0);
+  const el = document.getElementById("intel-count-label");
+  if (el) el.innerText = `${game.unlockedIntelIds.length} / ${total}`;
+}
+
+function updateCourtSelectedBanner() {
+  const st = getStage(game.stageNum);
+  const banner = document.getElementById("court-selected-banner");
+  const nameEl = document.getElementById("court-selected-ev-name");
+  if (game.selectedCourtEvId) {
+    const ev = st.evidences.find(e => e.id === game.selectedCourtEvId);
+    if (ev) {
+      nameEl.innerText = `${ev.code} ${evTitle(ev)}`;
+      banner.classList.remove("hidden");
+      return;
+    }
+  }
+  banner.classList.add("hidden");
+}
+
+function clearCourtEvSelection() {
+  game.selectedCourtEvId = null;
+  renderInventoryList();
+  updateCourtSelectedBanner();
+}
+
+function shiftStatement(delta) {
+  if (game.interrogationTarget === "witness") return;
+  playSound("tick");
+  const phase = activeTestimonyPhase();
+  game.stmtIdx = (game.stmtIdx + delta + phase.statements.length) % phase.statements.length;
+  renderCourtPanel();
+  const stmt = phase.statements[game.stmtIdx];
+  if (stmt) {
+    pushSuspectChat(`💬 [증언 ${game.stmtIdx + 1} 진술] "${stmt.text}"`, null, false);
+  }
+}
+
+async function pressStatement() {
+  if (game.isOver || game.isTyping) return;
+  const st = getStage(game.stageNum);
+
+  if (game.interrogationTarget === "witness" && st.witness) {
+    playSound("press");
+    pushPlayerChat(`🔍 [참고인 파고들기] "${st.witness.testimony}" — 정말 빠뜨린 사실이 없습니까?`);
+    await pushSuspectChat(`음... 글쎄요. ${st.witness.contradictionHint}`, null, true);
+    return;
+  }
+
+  const stmt = activeTestimonyPhase().statements[game.stmtIdx];
+  playSound("press");
+  pushPlayerChat(`🔍 [증언 파고들기] "${stmt.text}" — 그 진술의 구체적 근거를 대 보십시오!`);
+  if (!game.pressedStmtIds.includes(stmt.id)) {
+    game.pressedStmtIds.push(stmt.id);
+    game.pressure = Math.min(85, game.pressure + 15);
+    updateRightStatusPanel();
+  }
+  await pushSuspectChat(stmt.pressReply, null, true);
+}
+
+async function handleStatementBreakthrough(st, stmt) {
+  if (!game.brokenStmtIds.includes(stmt.id)) game.brokenStmtIds.push(stmt.id);
+  if (!game.unlockedIntelIds.includes(stmt.id)) game.unlockedIntelIds.push(stmt.id);
+  game.mood = "panic";
+  game.bpmSpike = 32;
+  playSound("breakthrough");
+  triggerDialogueEffect("breakthrough", "논리 돌파! 용의자의 핵심 방어선이 무너졌습니다!");
+  updateRightStatusPanel();
+  updateIntelCountLabel();
+
+  await pushSuspectChat(stmt.breakReply, "hit", true);
+
+  const phase = activeTestimonyPhase();
+  const rem = phase.statements.filter(s => !game.brokenStmtIds.includes(s.id));
+  if (rem.length > 0) {
+    game.stmtIdx = phase.statements.findIndex(s => s.id === rem[0].id);
+    pushSystemChat(`💥 논리 돌파! 같은 심문 단계의 남은 증언("${rem[0].text.slice(0, 22)}...")도 이어서 추궁하십시오.`);
+    renderCourtPanel();
+    return;
+  }
+
+  if (game.phaseIdx < st.testimonyPhases.length - 1) {
+    game.phaseIdx++;
+    game.stmtIdx = 0;
+    game.pressure = 0;
+    const nextP = activeTestimonyPhase();
+    document.getElementById("new-zone-dot").classList.remove("hidden");
+    pushSystemChat(`🔥 [${nextP.title}] 돌입! 새로운 현장 구역과 단서가 [1. 현장 수색] 탭에 개방되었습니다!`);
+    renderSceneMap();
+    renderCourtPanel();
+    if (nextP.statements?.[0]) {
+      await pushSuspectChat(`💬 [${nextP.title} · 증언 1] "${nextP.statements[0].text}"`, null, true);
+    }
+  } else {
+    document.getElementById("mindmap-ready-dot").classList.remove("hidden");
+    pushSystemChat(`🧠 [모든 증언 돌파 완료!] 이제 상단 [4. 추리 마인드맵] 탭에서 동기·수단·알리바이 붕괴 3대 노드를 연결해 최종 자백을 받아내십시오!`);
+  }
+}
+
+// ============================================================================
+// 8. 추리 보드 / 마인드 맵 (DEDUCTION WEB)
+// ============================================================================
+function renderMindmapBoard() {
+  const st = getStage(game.stageNum);
+  ["motive", "means", "opportunity"].forEach(key => {
+    const el = document.getElementById(`mm-slot-${key}`);
+    const evId = game.mindmapSlots[key];
+    const ev = evId ? st.evidences.find(e => e.id === evId) : null;
+    if (ev) {
+      el.className = "bg-purple-950/50 border border-purple-400 rounded-xl p-3 text-xs text-white font-bold min-h-[64px] flex flex-col items-center justify-center text-center";
+      el.innerHTML = `<span class="mono text-[10px] text-amber-300 mb-0.5">${ev.code}</span><span>${escapeHtml(evTitle(ev))}</span>`;
+    } else {
+      el.className = "bg-[#06080d] border border-slate-800 rounded-xl p-3 text-xs text-slate-400 min-h-[64px] flex items-center justify-center text-center";
+      el.innerText = "[비어 있음] 좌측 인벤토리에서 증거 선택 후 클릭";
+    }
+  });
+}
+
+function assignSelectedToMindmap(slotKey) {
+  playSound("select");
+  if (game.selectedCourtEvId) {
+    game.mindmapSlots[slotKey] = game.selectedCourtEvId;
+    clearCourtEvSelection();
+  } else if (game.mindmapSlots[slotKey]) {
+    game.mindmapSlots[slotKey] = null;
+  } else {
+    document.getElementById("mindmap-feedback").innerText = "⚠️ 먼저 좌측 인벤토리에서 감식 완료된 증거품을 클릭해 선택하세요.";
+  }
+  renderMindmapBoard();
+}
+
+function verifyDeductionMindmap() {
+  if (game.isOver) return;
+  const st = getStage(game.stageNum);
+  const fb = document.getElementById("mindmap-feedback");
+  const { motive, means, opportunity } = game.mindmapSlots;
+
+  if (!motive || !means || !opportunity) {
+    fb.innerHTML = `<span class="text-amber-400 font-bold">⚠️ 3대 범죄 요건(동기 · 수단 · 알리바이 붕괴) 슬롯을 모두 채워주세요.</span>`;
+    return;
+  }
+
+  const sol = st.mindmapSolution;
+  const allBroken = st.testimonyPhases.every(p => p.statements.every(s => game.brokenStmtIds.includes(s.id)));
+  if (!allBroken) {
+    playSound("damage");
+    fb.innerHTML = `<span class="text-amber-300 font-bold">🔍 아직 [3. 교차·역전 심문]에서 용의자의 모든 증언 모순을 돌파하지 못했습니다! 먼저 심문을 완료하세요.</span>`;
+    return;
+  }
+
+  if (motive === sol.motive && means === sol.means && opportunity === sol.opportunity) {
+    playSound("combine");
+    game.isOver = true;
+    game.mood = "broken";
+    updateRightStatusPanel();
+    document.getElementById("mindmap-status-badge").innerText = "✔ 사건 전말 재구성 완료";
+    document.getElementById("mindmap-status-badge").className = "mono text-[11px] font-bold px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-600";
+    fb.innerHTML = `<span class="text-emerald-400 font-extrabold">🎉 완벽한 추리 마인드맵 완성! 용의자가 모든 범행과 숨겨진 진실을 자백합니다...</span>`;
+    setTimeout(() => openConfessionModal(st), 650);
+  } else {
+    game.mistakes++;
+    game.hp = Math.max(0, game.hp - 1);
+    playSound("damage");
+    updateRightStatusPanel();
+    fb.innerHTML = `<span class="text-rose-400 font-bold">❌ 논리 연결 불일치:</span> 배치된 증거 중 일부가 해당 범죄 요건(동기/수단/알리바이)과 맞지 않습니다. (남은 신뢰도 ${game.hp}/${game.maxHp})`;
+    if (game.hp <= 0) {
+      game.isOver = true;
+      showResultModal(false, st, "F", `0 / ${game.maxHp}`, `${game.mistakes}회`, null);
+    }
+  }
+}
+
+// ============================================================================
+// 9. 자백 모달 & 엔딩 분기 & 신문 호외 속보 & 보드 갱신
+// ============================================================================
+function openConfessionModal(st) {
+  document.getElementById("conf-ep-tag").innerText = `CASE ${String(st.num).padStart(2, "0")}`;
+  document.getElementById("conf-portrait-box").innerHTML = drawPortraitSvg(st.suspect, "broken");
+  document.getElementById("conf-name").innerText = st.suspect.name;
+  document.getElementById("conf-role").innerText = st.suspect.role;
+  document.getElementById("conf-quote").innerText = `"${st.suspect.finalConfession}"`;
+  document.getElementById("conf-hidden-text").innerText = st.hiddenTruth || "사건 이면에 감춰진 진실이 밝혀졌습니다.";
+
+  const stampWrap = document.getElementById("conf-stamp-wrap");
+  stampWrap.classList.add("hidden");
+  document.getElementById("confession-modal").classList.remove("hidden");
+  switchBgmTrack("confession");
+}
+
+function confirmEndingChoice(choice) {
+  const st = getStage(game.stageNum);
+  const stampWrap = document.getElementById("conf-stamp-wrap");
+  const stampText = document.getElementById("conf-stamp-text");
+  stampText.innerText = choice === "B" ? "비밀 거래 체결" : "진술서 서명 확정";
+  stampWrap.classList.remove("hidden");
+  stampText.classList.add("stamp-anim");
+  playSound("stamp");
+
+  const rank = game.mistakes === 0 ? "S" : game.mistakes === 1 ? "A" : game.mistakes === 2 ? "B" : "C";
+  if (!game.solvedNums.includes(st.num)) game.solvedNums.push(st.num);
+  game.ranks[st.num] = rank;
+  game.endings[st.num] = choice;
+
+  if (st.num === 1) {
+    game.tutorialCompleted = true;
+  } else {
+    const allPool = [2, 3, 4, 5, 10];
+    const nextCandidate = allPool.find(n => !game.solvedNums.includes(n) && !game.activeBoardNums.includes(n));
+    game.activeBoardNums = game.activeBoardNums.map(n => (n === st.num ? nextCandidate : n)).filter(Boolean);
+    if (game.activeBoardNums.length === 0) {
+      game.activeBoardNums = [2, 3, 4, 5];
+    }
+  }
+
+  saveCampaignState();
+  updateReputationBadges();
+
+  setTimeout(() => {
+    document.getElementById("confession-modal").classList.add("hidden");
+    openNovelReaderForCurrentCase(choice, () => {
+      showResultModal(true, st, rank, `${game.hp} / ${game.maxHp}`, `${game.mistakes}회`, choice);
+    });
+  }, 850);
+}
+
+function showResultModal(isWin, st, rank, hpStr, mistStr, endingTag) {
+  document.getElementById("res-icon").innerText = isWin ? (st.num === 10 ? "🏆" : "⚖️") : "🚨";
+  document.getElementById("res-tag").innerText = isWin ? `CASE ${String(st.num).padStart(2, "0")} · ENDING ${endingTag || "A"}` : "CASE FAILED";
+  document.getElementById("res-title").innerText = isWin ? (endingTag === "B" ? "비밀 거래 성립 및 사건 종결" : "추리 마인드맵 완성 & 자백 확정!") : "수사 신뢰도 소진";
+  document.getElementById("res-desc").innerText = isWin ? st.suspect.winSummary : st.suspect.loseSummary;
+
+  const epBox = document.getElementById("res-epilogue-box");
+  if (isWin) {
+    epBox.innerText = endingTag === "B" ? `🕶️ [후일담] ${st.epilogueB}` : `⚖️ [후일담] ${st.epilogueA}`;
+    epBox.classList.remove("hidden");
+  } else {
+    epBox.classList.add("hidden");
+  }
+
+  document.getElementById("res-rank").innerText = rank;
+  document.getElementById("res-hp").innerText = hpStr;
+  document.getElementById("res-mistakes").innerText = mistStr;
+
+  const retryBtn = document.getElementById("res-retry-btn");
+  const nextBtn = document.getElementById("res-next-btn");
+  if (!isWin) {
+    retryBtn.classList.remove("hidden");
+    nextBtn.innerText = "브리핑 보드로 복귀";
+  } else {
+    retryBtn.classList.add("hidden");
+    nextBtn.innerText = st.num === 1 ? "신문 속보 확인 및 4개 사건 보드 열기 ▶" : "신문 속보 확인 및 다음 사건 선택 ▶";
+  }
+
+  document.getElementById("result-modal").classList.remove("hidden");
+}
+
+function proceedNextStage() {
+  document.getElementById("result-modal").classList.add("hidden");
+  const st = getStage(game.stageNum);
+  if (st.newspaper) {
+    document.getElementById("news-date").innerText = st.newspaper.date;
+    document.getElementById("news-kicker").innerText = st.newspaper.kicker;
+    document.getElementById("news-headline").innerText = st.newspaper.headline;
+    document.getElementById("news-body").innerText = st.newspaper.body;
+    document.getElementById("newspaper-modal").classList.remove("hidden");
+    switchBgmTrack("confession");
+  } else {
+    backToCampaignBoard();
+  }
+}
+
+function confirmNewspaperAndOpenBoard() {
+  playSound("select");
+  document.getElementById("newspaper-modal").classList.add("hidden");
+  backToCampaignBoard();
+}
+
+// ============================================================================
+// 10. 채팅 로그 · 자유 추궁 · 수사 수첩(타임라인/핀보드/자유 메모장)
+// ============================================================================
+function onChatScroll() {
+  const log = document.getElementById("interrogation-chat-log");
+  const btn = document.getElementById("chat-bottom-btn");
+  if (!log || !btn) return;
+  const near = log.scrollHeight - log.scrollTop - log.clientHeight <= 85;
+  btn.classList.toggle("hidden", near);
+}
+
+function scrollChatBottom(force = false) {
+  const log = document.getElementById("interrogation-chat-log");
+  if (!log) return;
+  if (force || log.scrollHeight - log.scrollTop - log.clientHeight <= 120) {
+    requestAnimationFrame(() => {
+      log.scrollTop = log.scrollHeight;
+      onChatScroll();
+    });
+  }
+}
+
+function pushSystemChat(text) {
+  const log = document.getElementById("interrogation-chat-log");
+  const div = document.createElement("div");
+  div.className = "self-center text-center text-[11px] text-slate-300 bg-[#0d121d] border border-slate-800 px-3.5 py-1.5 rounded-full shrink-0";
+  div.innerText = text;
+  log.appendChild(div);
+  scrollChatBottom(true);
+}
+
+function pushPlayerChat(text, ev = null) {
+  const log = document.getElementById("interrogation-chat-log");
+  const div = document.createElement("div");
+  div.className = "self-end max-w-[85%] flex flex-col items-end shrink-0 evidence-present-anim";
+  div.innerHTML = `
+    <span class="text-[10px] text-slate-400 mb-1">수사관 (나)</span>
+    <div class="bg-amber-600/20 border border-amber-500/50 text-slate-100 px-3.5 py-2.5 rounded-2xl rounded-tr-sm text-xs sm:text-sm leading-relaxed">
+      ${ev ? `<div class="text-[10px] font-extrabold text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded mb-1">🔎 ${escapeHtml(ev.code)} ${escapeHtml(evTitle(ev))}</div>` : ""}
+      <div>${escapeHtml(text)}</div>
+    </div>
+  `;
+  log.appendChild(div);
+  scrollChatBottom(true);
+}
+
+function pushSuspectChat(text, impact = null, useTyping = true) {
+  return new Promise(resolve => {
+    const st = getStage(game.stageNum);
+    const person = game.interrogationTarget === "witness" && st.witness ? st.witness : st.suspect;
+    speakCharacterVoice(text, person);
+
+    const log = document.getElementById("interrogation-chat-log");
+    const div = document.createElement("div");
+    div.className = "self-start max-w-[85%] flex flex-col items-start shrink-0";
+    div.innerHTML = `
+      <span class="text-[10px] text-slate-400 mb-1">${escapeHtml(person.name)}</span>
+      <div class="bg-[#0e131e] border ${impact === "hit" ? "border-red-500/80" : "border-slate-700"} text-slate-200 px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-xs sm:text-sm leading-relaxed">
+        <span class="msg-txt"></span>
+      </div>
+    `;
+    log.appendChild(div);
+    scrollChatBottom(true);
+    const span = div.querySelector(".msg-txt");
+
+    if (!useTyping) {
+      span.textContent = text;
+      resolve();
+      return;
+    }
+
+    if (game.typingTimer) {
+      clearInterval(game.typingTimer);
+      game.typingTimer = null;
+    }
+    game.isTyping = true;
+    span.classList.add("typing-cursor");
+    let i = 0;
+    game.typingTimer = setInterval(() => {
+      span.textContent += text.charAt(i++);
+      if (i % 3 === 0) playSound("tick", person.voicePitch || 1.0);
+      scrollChatBottom(false);
+      if (i >= text.length) {
+        clearInterval(game.typingTimer);
+        game.typingTimer = null;
+        span.classList.remove("typing-cursor");
+        game.isTyping = false;
+        resolve();
+      }
+    }, 15);
+  });
+}
+
+async function submitFreeInterrogation(e) {
+  e.preventDefault();
+  if (game.isOver || game.isTyping) return;
+  const inp = document.getElementById("free-question-input");
+  const q = (inp?.value || "").trim();
+  if (!q) return;
+
+  const st = getStage(game.stageNum);
+  const ev = game.selectedCourtEvId ? st.evidences.find(x => x.id === game.selectedCourtEvId) : null;
+  const tone = document.getElementById("interrogation-tone")?.value || "aggressive";
+
+  inp.value = "";
+  clearCourtEvSelection();
+  playSound("send");
+
+  const toneLbl = tone === "calm" ? "차분한 유도" : tone === "sarcastic" ? "냉소적 역심문" : "강압적 추궁";
+  pushPlayerChat(`💬 [${toneLbl}] ${q}`, ev);
+
+  if (game.interrogationTarget === "witness" && st.witness) {
+    const w = st.witness;
+    const hit = (w.keywords || []).some(k => q.toLowerCase().includes(k.toLowerCase()));
+    if (hit || ev) {
+      game.witnessBroken = true;
+      if (w.unlockEvId && !game.collectedEvIds.includes(w.unlockEvId)) {
+        game.collectedEvIds.push(w.unlockEvId);
+        renderInventoryList();
+      }
+      playSound("slip");
+      triggerDialogueEffect("slip", "참고인 진술 번복! 교차 심문 단서를 확보했습니다!");
+      pushSystemChat(`👥 [교차 심문 성공!] 참고인이 말을 바꾸며 새로운 교차 진술 증거를 확보했습니다!`);
+      renderCourtPanel();
+      await pushSuspectChat(w.breakReply, "hit", true);
+    } else {
+      await pushSuspectChat(`글쎄요, 전 제가 본 대로 말씀드렸습니다. (${w.contradictionHint})`, null, true);
+    }
+    return;
+  }
+
+  const stmt = activeTestimonyPhase().statements[game.stmtIdx];
+  const stopWords = new Set(["사건", "증언", "시간", "기록", "확인", "내용", "사실", "진술", "사람", "부분", "경우", "정도"]);
+  const targetEv = st.evidences.find(x => x.id === stmt.contradictsWith);
+
+  const tokens = new Set(stmt.keywords || []);
+  if (targetEv) {
+    `${evTitle(targetEv)} ${evDesc(targetEv)}`
+      .split(/[\s,."()[\]·:!?]+/)
+      .map(w => w.replace(/(은|는|이|가|을|를|의|에|로|으로|와|과|다|요|습니다)$/, ""))
+      .filter(w => w.length >= 2 && !stopWords.has(w))
+      .forEach(w => tokens.add(w));
+  }
+  const matched = Array.from(tokens).filter(k => q.toLowerCase().includes(k.toLowerCase()));
+
+  if (ev && stmt.contradictsWith === ev.id && isEvAnalyzed(ev)) {
+    if (!game.unlockedIntelIds.includes(stmt.id) && matched.length === 0 && q.length < 6) {
+      pushSystemChat(`💡 [수사 힌트] 증거만 내밀기보다 증언의 어떤 부분이 모순인지 구체적으로 질문해 보세요!`);
+      await pushSuspectChat(`그 증거([${ev.code}])를 내밀면서 정확히 무엇이 모순이라는 겁니까?`, null, true);
+      return;
+    }
+    await handleStatementBreakthrough(st, stmt);
+    return;
+  }
+
+  if (ev && stmt.contradictsWith !== ev.id) {
+    game.mistakes++;
+    game.hp = Math.max(0, game.hp - 1);
+    playSound("damage");
+    updateRightStatusPanel();
+    await pushSuspectChat(`그 증거([${ev.code}])는 지금 제 진술과 맞지 않습니다. 다른 단서나 논리로 따져 보시죠!`, null, true);
+    if (game.hp <= 0) {
+      game.isOver = true;
+      showResultModal(false, st, "F", `0 / ${game.maxHp}`, `${game.mistakes}회`, null);
+    }
+    return;
+  }
+
+  if (matched.length >= 1) {
+    if (!game.unlockedIntelIds.includes(stmt.id)) {
+      game.unlockedIntelIds.push(stmt.id);
+      updateIntelCountLabel();
+    }
+    const gain = tone === "calm" ? 45 : 35;
+    game.pressure = Math.min(100, game.pressure + gain);
+    game.mood = "panic";
+    game.bpmSpike = 24;
+    playSound("slip");
+    triggerDialogueEffect("slip", `말실수 포착! 핵심 모순 단서 '${matched[0]}' 해금!`);
+    updateRightStatusPanel();
+
+    const hasTargetCollected = game.collectedEvIds.includes(stmt.contradictsWith);
+    if (!hasTargetCollected) {
+      pushSystemChat(`🔍 [수사 힌트] 용의자가 동요하고 있습니다! [1. 현장 수색] 및 [2. CSI 감식·결합]에서 결정적 물증을 확보한 뒤 제시하세요.`);
+    } else {
+      pushSystemChat(`⚡ [말실수 포착!] 모순 진술을 끌어냈습니다! 좌측 인벤토리에서 감식 완료된 증거를 선택한 채 추궁하세요!`);
+    }
+
+    await pushSuspectChat(`잠깐... '${matched[0]}' 부분을 어떻게 아신 겁니까?! 그, 그건 단순한 우연입니다! 물증이 없다면 인정 못 합니다!`, "hit", true);
+
+    if (game.pressure >= 100 && hasTargetCollected && isEvAnalyzed(targetEv)) {
+      game.pressure = 0;
+      await handleStatementBreakthrough(st, stmt);
+    }
+    return;
+  }
+
+  const uncollectedCount = st.scene.hotspots.filter(h => game.phaseIdx >= h.unlockPhase && !game.collectedEvIds.includes(h.evId)).length;
+  const unanalyzedCount = game.collectedEvIds.map(id => st.evidences.find(x => x.id === id)).filter(x => x && !isEvAnalyzed(x)).length;
+  if (uncollectedCount > 0 || unanalyzedCount > 0) {
+    pushSystemChat(`💡 [수사관 독백] 아직 현장 단서 조사가 더 필요한 것 같다... ([1. 현장 수색] 또는 [2. CSI 감식]을 확인해 보자)`);
+  }
+
+  await pushSuspectChat(`추측만으로 몰아세우지 마십시오. 제 증언 "${stmt.text}"의 정확한 모순점이나 물증을 대 보시죠.`, null, true);
+}
+
+function updateRightStatusPanel() {
+  const st = getStage(game.stageNum);
+  const person = game.interrogationTarget === "witness" && st.witness ? st.witness : st.suspect;
+  document.getElementById("portrait-case-id").innerText = `CASE // ${String(st.num).padStart(2, "0")}`;
+  document.getElementById("portrait-name").innerText = person.name;
+  document.getElementById("portrait-role").innerText = person.role;
+  document.getElementById("suspect-portrait-box").innerHTML = drawPortraitSvg(person, game.mood);
+
+  const moodMap = { calm: "침착함", alert: "경계 태세", panic: "극심한 동요", broken: "심리 붕괴" };
+  const moodEl = document.getElementById("portrait-mood-text");
+  moodEl.innerText = moodMap[game.mood] || "침착함";
+  moodEl.className = game.mood === "broken" || game.mood === "panic" ? "font-extrabold text-red-400" : "font-extrabold text-amber-400";
+
+  document.getElementById("pressure-value-text").innerText = `${game.pressure}%`;
+  document.getElementById("pressure-bar").style.width = `${game.pressure}%`;
+  document.getElementById("hp-text").innerText = `${game.hp} / ${game.maxHp}`;
+
+  const hearts = document.getElementById("hp-hearts");
+  hearts.innerHTML = "";
+  for (let i = 0; i < game.maxHp; i++) {
+    hearts.innerHTML += `<span>${i < game.hp ? "🛡️" : "🖤"}</span>`;
+  }
+}
+
+// ============================================================================
+// 11. 수사관 수첩 (타임라인 · 증거 핀보드 · 자유 메모장)
+// ============================================================================
+function openNotebookModal() {
+  playSound("select");
+  const st = getStage(game.stageNum);
+
+  document.getElementById("notebook-timeline-list").innerHTML = st.timeline
+    .map(t => `<div class="bg-[#070a10] border border-slate-800 rounded-xl px-3 py-2 flex gap-3"><span class="mono font-bold text-amber-400 shrink-0">${t.time}</span><span class="text-slate-200">${escapeHtml(t.event)}</span></div>`)
+    .join("");
+
+  const owned = game.collectedEvIds.map(id => st.evidences.find(e => e.id === id)).filter(Boolean);
+  document.getElementById("notebook-pinboard-grid").innerHTML = owned.length
+    ? owned.map(ev => `<div class="bg-[#070a10] border border-slate-700 rounded-xl p-3"><div class="flex items-center justify-between mb-1"><span class="mono text-[10px] font-black text-amber-400">${ev.code}</span><span class="text-[10px] text-emerald-400">${isEvAnalyzed(ev) ? "감식 완료" : "미감식"}</span></div><strong class="text-white block mb-1">${escapeHtml(evTitle(ev))}</strong><p class="text-slate-400 leading-snug">${escapeHtml(evDesc(ev))}</p></div>`).join("")
+    : `<p class="text-slate-500 col-span-2 text-center py-6">아직 핀보드에 고정할 확보 증거가 없습니다.</p>`;
+
+  const memoArea = document.getElementById("detective-memo-textarea");
+  if (memoArea) {
+    memoArea.value = game.memos[st.num] || "";
+  }
+
+  switchNotebookTab("timeline");
+  document.getElementById("notebook-modal").classList.remove("hidden");
+}
+
+function switchNotebookTab(tab) {
+  ["timeline", "pinboard", "memo"].forEach(t => {
+    document.getElementById(`nb-view-${t}`).classList.toggle("hidden", t !== tab);
+    const btn = document.getElementById(`nb-tab-${t}`);
+    btn.className = t === tab
+      ? "px-2.5 py-1 rounded bg-amber-600 text-white font-bold"
+      : "px-2.5 py-1 rounded text-slate-300 hover:text-white font-bold";
+  });
+}
+
+function saveCaseMemo() {
+  const val = document.getElementById("detective-memo-textarea")?.value || "";
+  game.memos[game.stageNum] = val;
+  saveCampaignState();
+  const stEl = document.getElementById("memo-save-status");
+  if (stEl) stEl.innerText = "✔ 자동 저장 완료";
+}
+
+function closeNotebookModal() {
+  document.getElementById("notebook-modal").classList.add("hidden");
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, m => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[m]));
+}
+
+// ============================================================================
+// 12. 느와르 파티클 배경 & 초기화 부팅
+// ============================================================================
+function startNoirBg() {
+  const canvas = document.getElementById("noir-particles");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const dots = Array.from({ length: 34 }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: Math.random() * 1.8 + 0.6,
+    vx: (Math.random() - 0.5) * 0.25,
+    vy: -Math.random() * 0.35 - 0.1,
+    a: Math.random() * 0.5 + 0.15
+  }));
+
+  function loop() {
+    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    dots.forEach(d => {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.y < -10) d.y = canvas.height + 10;
+      if (d.x < -10) d.x = canvas.width + 10;
+      if (d.x > canvas.width + 10) d.x = -10;
+      ctx.fillStyle = `rgba(245, 158, 11, ${d.a})`;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+function initApp() {
+  syncVolumeUi();
+  renderCampaignLanding();
+  startNoirBg();
+  startEcgMonitor();
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
+</script>
+</body>
+</html>
